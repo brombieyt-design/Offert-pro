@@ -301,7 +301,8 @@ export default function PricingPage() {
             <p className="text-gray-500">A detailed look at what&apos;s included in each plan.</p>
           </div>
 
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+          <div className="min-w-[560px] bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             {/* Table header */}
             <div className="grid grid-cols-5 border-b border-gray-100 bg-gray-50/50">
               <div className="col-span-1 px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -335,6 +336,7 @@ export default function PricingPage() {
                 ))}
               </div>
             ))}
+          </div>
           </div>
         </div>
       </section>

@@ -103,6 +103,14 @@ export function AppLayout({ children }: AppLayoutProps) {
             </svg>
           </div>
           <span className="text-lg font-bold text-gray-900 tracking-tight">Offert-pro</span>
+          <button
+            className="ml-auto lg:hidden p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         {/* Navigation */}
@@ -163,10 +171,10 @@ export function AppLayout({ children }: AppLayoutProps) {
       {/* Huvudinnehåll */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Topprad */}
-        <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-4">
+        <header className="bg-white border-b border-gray-100 px-4 sm:px-6 py-3.5 flex items-center gap-3">
           {/* Mobilmenyknapp */}
           <button
-            className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+            className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors shrink-0"
             onClick={() => setMobileMenuOpen(true)}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -174,9 +182,9 @@ export function AppLayout({ children }: AppLayoutProps) {
             </svg>
           </button>
 
-          {/* Sök */}
-          <div className="flex-1 max-w-md">
-            <div className="relative">
+          {/* Sök – dold på mobil */}
+          <div className="hidden sm:flex flex-1 max-w-md">
+            <div className="relative w-full">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -188,7 +196,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex items-center gap-1 sm:gap-2 ml-auto">
             {/* Notiser */}
             <button className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

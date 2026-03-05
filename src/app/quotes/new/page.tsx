@@ -239,7 +239,8 @@ export default function NewQuotePage() {
             <p className="text-sm text-gray-500 mb-6">Add products or services to this quote.</p>
 
             {/* Line items table */}
-            <div className="border border-gray-200 rounded-xl overflow-hidden mb-4">
+            <div className="overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0 mb-4">
+            <div className="min-w-[480px] border border-gray-200 rounded-xl overflow-hidden">
               <div className="grid grid-cols-12 gap-0 bg-gray-50 border-b border-gray-200">
                 <div className="col-span-6 px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</div>
                 <div className="col-span-2 px-3 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Qty</div>
@@ -298,6 +299,7 @@ export default function NewQuotePage() {
                   </div>
                 </div>
               ))}
+            </div>
             </div>
 
             <button
@@ -394,7 +396,8 @@ export default function NewQuotePage() {
               </div>
 
               {/* Line items */}
-              <div className="border border-gray-100 rounded-xl overflow-hidden mb-8">
+              <div className="overflow-x-auto -mx-6 sm:-mx-10 px-6 sm:px-10 mb-8">
+              <div className="min-w-[400px] border border-gray-100 rounded-xl overflow-hidden">
                 <div className="grid grid-cols-12 bg-indigo-50 px-4 py-2.5">
                   <div className="col-span-6 text-xs font-semibold text-indigo-700 uppercase tracking-wider">Description</div>
                   <div className="col-span-2 text-xs font-semibold text-indigo-700 uppercase tracking-wider text-center">Qty</div>
@@ -414,6 +417,7 @@ export default function NewQuotePage() {
                       <div className="col-span-2 text-sm font-semibold text-gray-900 text-right">{formatCurrency(item.qty * item.unitPrice)}</div>
                     </div>
                   ))}
+              </div>
               </div>
 
               {/* Totals */}
