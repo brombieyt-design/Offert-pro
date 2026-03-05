@@ -33,10 +33,10 @@ const defaultLineItems: LineItem[] = [
 ];
 
 const steps = [
-  { number: 1, label: "Client Info" },
-  { number: 2, label: "Line Items" },
-  { number: 3, label: "Preview" },
-  { number: 4, label: "Send" },
+  { number: 1, label: "Kundinformation" },
+  { number: 2, label: "Radartiklar" },
+  { number: 3, label: "Förhandsvisning" },
+  { number: 4, label: "Skicka" },
 ];
 
 function generateId() {
@@ -44,14 +44,14 @@ function generateId() {
 }
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
+  return new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK", maximumFractionDigits: 0 }).format(amount);
 }
 
 export default function NewQuotePage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [clientInfo, setClientInfo] = useState<ClientInfo>(defaultClientInfo);
   const [lineItems, setLineItems] = useState<LineItem[]>(defaultLineItems);
-  const [taxRate, setTaxRate] = useState(10);
+  const [taxRate, setTaxRate] = useState(25);
   const [quoteNumber] = useState("QT-" + String(Math.floor(Math.random() * 900) + 100).padStart(3, "0"));
   const [sendMethod, setSendMethod] = useState<"email" | "link">("email");
   const [sent, setSent] = useState(false);
@@ -97,7 +97,7 @@ export default function NewQuotePage() {
   return (
     <AppLayout>
       <div className="p-6 lg:p-8 max-w-4xl mx-auto">
-        {/* Header */}
+        {/* Sidhuvud */}
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => window.history.back()}
@@ -108,12 +108,12 @@ export default function NewQuotePage() {
             </svg>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">New Quote</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Quote #{quoteNumber}</p>
+            <h1 className="text-2xl font-bold text-gray-900">Ny offert</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Offert #{quoteNumber}</p>
           </div>
         </div>
 
-        {/* Step indicator */}
+        {/* Stegindikator */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">
             {steps.map((step, index) => (
@@ -156,20 +156,20 @@ export default function NewQuotePage() {
           </div>
         </div>
 
-        {/* Step content */}
+        {/* Steg 1 – Kundinformation */}
         {currentStep === 1 && (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">Client Information</h2>
-            <p className="text-sm text-gray-500 mb-6">Who is this quote for?</p>
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">Kundinformation</h2>
+            <p className="text-sm text-gray-500 mb-6">Vem är offerten till?</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Client Name <span className="text-red-500">*</span>
+                  Kundnamn <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Sarah Chen"
+                  placeholder="t.ex. Anna Svensson"
                   value={clientInfo.name}
                   onChange={(e) => setClientInfo({ ...clientInfo, name: e.target.value })}
                   className="form-input"
@@ -177,11 +177,11 @@ export default function NewQuotePage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Email Address <span className="text-red-500">*</span>
+                  E-postadress <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
-                  placeholder="e.g. sarah@company.com"
+                  placeholder="t.ex. anna@foretag.se"
                   value={clientInfo.email}
                   onChange={(e) => setClientInfo({ ...clientInfo, email: e.target.value })}
                   className="form-input"
@@ -189,40 +189,40 @@ export default function NewQuotePage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Company <span className="text-red-500">*</span>
+                  Företag <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Acme Corp"
+                  placeholder="t.ex. Acme AB"
                   value={clientInfo.company}
                   onChange={(e) => setClientInfo({ ...clientInfo, company: e.target.value })}
                   className="form-input"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">City / Region</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Stad / Region</label>
                 <input
                   type="text"
-                  placeholder="e.g. San Francisco, CA"
+                  placeholder="t.ex. Stockholm"
                   value={clientInfo.city}
                   onChange={(e) => setClientInfo({ ...clientInfo, city: e.target.value })}
                   className="form-input"
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Billing Address</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Faktureringsadress</label>
                 <input
                   type="text"
-                  placeholder="e.g. 123 Main St, Suite 100"
+                  placeholder="t.ex. Kungsgatan 10, 111 43 Stockholm"
                   value={clientInfo.address}
                   onChange={(e) => setClientInfo({ ...clientInfo, address: e.target.value })}
                   className="form-input"
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Notes (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Anteckningar (valfritt)</label>
                 <textarea
-                  placeholder="Any additional notes for the client..."
+                  placeholder="Eventuella ytterligare anteckningar till kunden..."
                   value={clientInfo.notes}
                   onChange={(e) => setClientInfo({ ...clientInfo, notes: e.target.value })}
                   rows={3}
@@ -233,19 +233,20 @@ export default function NewQuotePage() {
           </div>
         )}
 
+        {/* Steg 2 – Radartiklar */}
         {currentStep === 2 && (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">Line Items</h2>
-            <p className="text-sm text-gray-500 mb-6">Add products or services to this quote.</p>
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">Radartiklar</h2>
+            <p className="text-sm text-gray-500 mb-6">Lägg till produkter eller tjänster i offerten.</p>
 
-            {/* Line items table */}
+            {/* Radartikeltabell */}
             <div className="overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0 mb-4">
             <div className="min-w-[480px] border border-gray-200 rounded-xl overflow-hidden">
               <div className="grid grid-cols-12 gap-0 bg-gray-50 border-b border-gray-200">
-                <div className="col-span-6 px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</div>
-                <div className="col-span-2 px-3 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Qty</div>
-                <div className="col-span-2 px-3 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Unit Price</div>
-                <div className="col-span-1 px-3 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Total</div>
+                <div className="col-span-6 px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Beskrivning</div>
+                <div className="col-span-2 px-3 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Ant.</div>
+                <div className="col-span-2 px-3 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Styckpris</div>
+                <div className="col-span-1 px-3 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Totalt</div>
                 <div className="col-span-1 px-2 py-2.5" />
               </div>
 
@@ -254,7 +255,7 @@ export default function NewQuotePage() {
                   <div className="col-span-6 px-4 py-2.5">
                     <input
                       type="text"
-                      placeholder="Describe the service or product..."
+                      placeholder="Beskriv tjänsten eller produkten..."
                       value={item.description}
                       onChange={(e) => updateLineItem(item.id, "description", e.target.value)}
                       className="w-full text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none bg-transparent"
@@ -270,16 +271,16 @@ export default function NewQuotePage() {
                     />
                   </div>
                   <div className="col-span-2 px-3 py-2.5 flex items-center">
-                    <span className="text-gray-400 text-sm mr-1">$</span>
                     <input
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       value={item.unitPrice || ""}
-                      placeholder="0.00"
+                      placeholder="0"
                       onChange={(e) => updateLineItem(item.id, "unitPrice", parseFloat(e.target.value) || 0)}
                       className="w-full text-sm text-gray-900 focus:outline-none bg-transparent placeholder:text-gray-400"
                     />
+                    <span className="text-gray-400 text-xs ml-1 shrink-0">kr</span>
                   </div>
                   <div className="col-span-1 px-3 py-2.5 flex items-center justify-end">
                     <span className="text-sm font-semibold text-gray-900">
@@ -309,18 +310,18 @@ export default function NewQuotePage() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
               </svg>
-              Add line item
+              Lägg till rad
             </button>
 
-            {/* Totals */}
+            {/* Summering */}
             <div className="border-t border-gray-100 pt-4 space-y-2 max-w-xs ml-auto">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Subtotal</span>
+                <span className="text-gray-500">Delsumma</span>
                 <span className="font-medium text-gray-900">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-500">Tax</span>
+                  <span className="text-gray-500">Moms</span>
                   <div className="flex items-center gap-1">
                     <input
                       type="number"
@@ -336,23 +337,24 @@ export default function NewQuotePage() {
                 <span className="font-medium text-gray-900">{formatCurrency(tax)}</span>
               </div>
               <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-100">
-                <span className="text-gray-900">Total</span>
+                <span className="text-gray-900">Totalt</span>
                 <span className="text-indigo-600">{formatCurrency(total)}</span>
               </div>
             </div>
           </div>
         )}
 
+        {/* Steg 3 – Förhandsvisning */}
         {currentStep === 3 && (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <h2 className="text-lg font-semibold text-gray-900">Quote Preview</h2>
-              <span className="text-sm text-gray-500">Review before sending</span>
+              <h2 className="text-lg font-semibold text-gray-900">Förhandsvisning av offert</h2>
+              <span className="text-sm text-gray-500">Granska innan du skickar</span>
             </div>
 
-            {/* Quote document */}
+            {/* Offertdokument */}
             <div className="p-6 sm:p-10">
-              {/* Quote header */}
+              {/* Offerthuvud */}
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 mb-10">
                 <div>
                   <div className="flex items-center gap-2.5 mb-6">
@@ -365,29 +367,29 @@ export default function NewQuotePage() {
                   </div>
                   <p className="text-sm text-gray-500">Jane Doe</p>
                   <p className="text-sm text-gray-500">jane@example.com</p>
-                  <p className="text-sm text-gray-500">San Francisco, CA</p>
+                  <p className="text-sm text-gray-500">Stockholm</p>
                 </div>
                 <div className="text-left sm:text-right">
-                  <div className="text-2xl font-extrabold text-gray-900 mb-1">QUOTE</div>
+                  <div className="text-2xl font-extrabold text-gray-900 mb-1">OFFERT</div>
                   <div className="text-lg font-semibold text-indigo-600 mb-3">{quoteNumber}</div>
                   <div className="text-sm text-gray-500">
                     <div className="flex sm:justify-end gap-4 text-xs">
                       <div>
-                        <p className="font-medium text-gray-600">Issue Date</p>
-                        <p>Mar 4, 2026</p>
+                        <p className="font-medium text-gray-600">Utfärdandedatum</p>
+                        <p>4 mar 2026</p>
                       </div>
                       <div>
-                        <p className="font-medium text-gray-600">Valid Until</p>
-                        <p>Apr 4, 2026</p>
+                        <p className="font-medium text-gray-600">Giltig till</p>
+                        <p>4 apr 2026</p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Bill to */}
+              {/* Faktureras till */}
               <div className="mb-8">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Bill To</p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Faktureras till</p>
                 <p className="text-base font-semibold text-gray-900">{clientInfo.name || "—"}</p>
                 <p className="text-sm text-gray-600">{clientInfo.company || "—"}</p>
                 {clientInfo.address && <p className="text-sm text-gray-600">{clientInfo.address}</p>}
@@ -395,14 +397,14 @@ export default function NewQuotePage() {
                 <p className="text-sm text-gray-600">{clientInfo.email || "—"}</p>
               </div>
 
-              {/* Line items */}
+              {/* Radartiklar */}
               <div className="overflow-x-auto -mx-6 sm:-mx-10 px-6 sm:px-10 mb-8">
               <div className="min-w-[400px] border border-gray-100 rounded-xl overflow-hidden">
                 <div className="grid grid-cols-12 bg-indigo-50 px-4 py-2.5">
-                  <div className="col-span-6 text-xs font-semibold text-indigo-700 uppercase tracking-wider">Description</div>
-                  <div className="col-span-2 text-xs font-semibold text-indigo-700 uppercase tracking-wider text-center">Qty</div>
-                  <div className="col-span-2 text-xs font-semibold text-indigo-700 uppercase tracking-wider text-right">Unit Price</div>
-                  <div className="col-span-2 text-xs font-semibold text-indigo-700 uppercase tracking-wider text-right">Total</div>
+                  <div className="col-span-6 text-xs font-semibold text-indigo-700 uppercase tracking-wider">Beskrivning</div>
+                  <div className="col-span-2 text-xs font-semibold text-indigo-700 uppercase tracking-wider text-center">Ant.</div>
+                  <div className="col-span-2 text-xs font-semibold text-indigo-700 uppercase tracking-wider text-right">Styckpris</div>
+                  <div className="col-span-2 text-xs font-semibold text-indigo-700 uppercase tracking-wider text-right">Totalt</div>
                 </div>
                 {lineItems
                   .filter((item) => item.description || item.unitPrice > 0)
@@ -411,7 +413,7 @@ export default function NewQuotePage() {
                       key={item.id}
                       className={`grid grid-cols-12 px-4 py-3 ${index < arr.length - 1 ? "border-b border-gray-100" : ""}`}
                     >
-                      <div className="col-span-6 text-sm text-gray-800">{item.description || <span className="text-gray-400 italic">No description</span>}</div>
+                      <div className="col-span-6 text-sm text-gray-800">{item.description || <span className="text-gray-400 italic">Ingen beskrivning</span>}</div>
                       <div className="col-span-2 text-sm text-gray-700 text-center">{item.qty}</div>
                       <div className="col-span-2 text-sm text-gray-700 text-right">{formatCurrency(item.unitPrice)}</div>
                       <div className="col-span-2 text-sm font-semibold text-gray-900 text-right">{formatCurrency(item.qty * item.unitPrice)}</div>
@@ -420,40 +422,41 @@ export default function NewQuotePage() {
               </div>
               </div>
 
-              {/* Totals */}
+              {/* Summering */}
               <div className="max-w-xs ml-auto space-y-2 mb-8">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Subtotal</span>
+                  <span className="text-gray-500">Delsumma</span>
                   <span className="text-gray-900">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Tax ({taxRate}%)</span>
+                  <span className="text-gray-500">Moms ({taxRate}%)</span>
                   <span className="text-gray-900">{formatCurrency(tax)}</span>
                 </div>
                 <div className="flex justify-between text-base font-extrabold pt-2 border-t border-gray-200">
-                  <span className="text-gray-900">Total Due</span>
+                  <span className="text-gray-900">Att betala</span>
                   <span className="text-indigo-600">{formatCurrency(total)}</span>
                 </div>
               </div>
 
-              {/* Notes */}
+              {/* Anteckningar */}
               {clientInfo.notes && (
                 <div className="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Notes</p>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Anteckningar</p>
                   <p className="text-sm text-gray-700">{clientInfo.notes}</p>
                 </div>
               )}
 
-              {/* Footer */}
+              {/* Sidfot */}
               <div className="border-t border-gray-100 pt-6 text-center">
                 <p className="text-xs text-gray-400">
-                  This quote is valid for 30 days. Generated by Offert-pro.
+                  Denna offert är giltig i 30 dagar. Skapad av Offert-pro.
                 </p>
               </div>
             </div>
           </div>
         )}
 
+        {/* Steg 4 – Skicka */}
         {currentStep === 4 && (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             {sent ? (
@@ -463,58 +466,58 @@ export default function NewQuotePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Quote Sent!</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Offert skickad!</h3>
                 <p className="text-gray-500 mb-6">
-                  Your quote {quoteNumber} has been sent to{" "}
-                  <span className="font-medium text-gray-700">{clientInfo.email || "the client"}</span>.
-                  You&apos;ll be notified when they open it.
+                  Din offert {quoteNumber} har skickats till{" "}
+                  <span className="font-medium text-gray-700">{clientInfo.email || "kunden"}</span>.
+                  Du får ett meddelande när de öppnar den.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <a
                     href="/quotes"
                     className="px-6 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
                   >
-                    View All Quotes
+                    Visa alla offerter
                   </a>
                   <a
                     href="/quotes/new"
                     className="px-6 py-3 bg-white text-gray-700 text-sm font-semibold rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
                   >
-                    Create Another
+                    Skapa en ny
                   </a>
                 </div>
               </div>
             ) : (
               <>
-                <h2 className="text-lg font-semibold text-gray-900 mb-1">Send Quote</h2>
-                <p className="text-sm text-gray-500 mb-6">Choose how to deliver this quote to your client.</p>
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">Skicka offert</h2>
+                <p className="text-sm text-gray-500 mb-6">Välj hur du vill leverera offerten till kunden.</p>
 
-                {/* Summary card */}
+                {/* Sammanfattningskort */}
                 <div className="bg-slate-50 rounded-xl p-4 border border-gray-100 mb-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-gray-500 mb-0.5">Sending to</p>
+                      <p className="text-xs text-gray-500 mb-0.5">Skickas till</p>
                       <p className="text-sm font-semibold text-gray-900">
-                        {clientInfo.name || "Client"} · {clientInfo.company || "—"}
+                        {clientInfo.name || "Kund"} · {clientInfo.company || "—"}
                       </p>
                       <p className="text-xs text-gray-500 mt-0.5">{clientInfo.email || "—"}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-gray-500 mb-0.5">Quote total</p>
+                      <p className="text-xs text-gray-500 mb-0.5">Offerttotal</p>
                       <p className="text-xl font-extrabold text-indigo-600">{formatCurrency(total)}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Send method */}
+                {/* Leveransmetod */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Delivery method</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Leveransmetod</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
                       {
                         id: "email" as const,
-                        label: "Send via Email",
-                        desc: "Deliver directly to client inbox",
+                        label: "Skicka via e-post",
+                        desc: "Leverera direkt till kundens inkorg",
                         icon: (
                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -523,8 +526,8 @@ export default function NewQuotePage() {
                       },
                       {
                         id: "link" as const,
-                        label: "Share a Link",
-                        desc: "Copy and share a unique quote URL",
+                        label: "Dela en länk",
+                        desc: "Kopiera och dela en unik offert-URL",
                         icon: (
                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
@@ -559,12 +562,12 @@ export default function NewQuotePage() {
                   </div>
                 </div>
 
-                {/* Options */}
+                {/* Alternativ */}
                 <div className="space-y-3 mb-6">
                   {[
-                    { label: "Enable e-signature", desc: "Let client sign digitally", defaultChecked: true },
-                    { label: "Auto-reminder after 3 days", desc: "Follow up if no response", defaultChecked: true },
-                    { label: "Notify me when opened", desc: "Real-time open tracking", defaultChecked: true },
+                    { label: "Aktivera e-signatur", desc: "Låt kunden signera digitalt", defaultChecked: true },
+                    { label: "Automatisk påminnelse efter 3 dagar", desc: "Följ upp om inget svar", defaultChecked: true },
+                    { label: "Meddela mig när den öppnas", desc: "Realtidsspårning av öppning", defaultChecked: true },
                   ].map((opt) => (
                     <label key={opt.label} className="flex items-center gap-3 cursor-pointer group">
                       <input
@@ -587,14 +590,14 @@ export default function NewQuotePage() {
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                   </svg>
-                  {sendMethod === "email" ? `Send Quote to ${clientInfo.email || "Client"}` : "Copy Share Link"}
+                  {sendMethod === "email" ? `Skicka offert till ${clientInfo.email || "kunden"}` : "Kopiera delningslänk"}
                 </button>
               </>
             )}
           </div>
         )}
 
-        {/* Navigation buttons */}
+        {/* Navigeringsknappar */}
         {!sent && (
           <div className="flex items-center justify-between mt-6">
             <button
@@ -602,7 +605,7 @@ export default function NewQuotePage() {
               disabled={currentStep === 1}
               className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              Back
+              Tillbaka
             </button>
 
             {currentStep < 4 && (
@@ -611,7 +614,7 @@ export default function NewQuotePage() {
                 disabled={!canProceed()}
                 className="px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
               >
-                {currentStep === 3 ? "Continue to Send" : "Next Step"}
+                {currentStep === 3 ? "Fortsätt till sändning" : "Nästa steg"}
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>

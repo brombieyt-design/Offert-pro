@@ -3,98 +3,98 @@ import { Navbar } from "@/components/layout/Navbar";
 
 const pricingTiers = [
   {
-    name: "Free",
-    price: "$0",
-    period: "/month",
-    description: "Try Offert-pro with no strings attached",
+    name: "Gratis",
+    price: "0 kr",
+    period: "/månad",
+    description: "Prova Offert-pro utan några förpliktelser",
     features: [
-      "5 quotes per month",
-      "1 user",
-      "Basic PDF export",
-      "Email delivery",
-      "7-day quote expiry",
-      "Basic templates",
-      "Community support",
+      "5 offerter per månad",
+      "1 användare",
+      "Grundläggande PDF-export",
+      "E-postleverans",
+      "7 dagars offertgiltighet",
+      "Grundläggande mallar",
+      "Community-support",
     ],
     notIncluded: [
-      "Custom branding",
-      "Real-time tracking",
-      "E-signatures",
-      "Auto reminders",
-      "Analytics",
+      "Anpassad profilering",
+      "Realtidsspårning",
+      "E-signaturer",
+      "Automatiska påminnelser",
+      "Analys",
     ],
-    cta: "Get started free",
+    cta: "Kom igång gratis",
     ctaHref: "/dashboard",
     highlighted: false,
   },
   {
     name: "Starter",
-    price: "$19",
-    period: "/month",
-    description: "For freelancers and solopreneurs ready to scale",
+    price: "199 kr",
+    period: "/månad",
+    description: "För frilansare och soloföretagare redo att växa",
     features: [
-      "25 quotes per month",
-      "1 user",
-      "Custom branding & logo",
-      "Real-time open tracking",
-      "E-signatures",
-      "Auto follow-up reminders",
-      "Templates library (20+)",
-      "Email support (48h)",
+      "25 offerter per månad",
+      "1 användare",
+      "Anpassad profilering och logotyp",
+      "Realtidsspårning av öppningar",
+      "E-signaturer",
+      "Automatiska uppföljningspåminnelser",
+      "Mallbibliotek (20+)",
+      "E-postsupport (48 h)",
     ],
     notIncluded: [
-      "Advanced analytics",
-      "Custom domain",
-      "API access",
-      "CRM integrations",
+      "Avancerad analys",
+      "Anpassad domän",
+      "API-åtkomst",
+      "CRM-integrationer",
     ],
-    cta: "Start 14-day free trial",
+    cta: "Starta 14 dagars gratis provperiod",
     ctaHref: "/dashboard",
     highlighted: false,
   },
   {
     name: "Pro",
-    price: "$49",
-    period: "/month",
-    description: "For growing teams that want every edge",
+    price: "499 kr",
+    period: "/månad",
+    description: "För växande team som vill ha varje fördel",
     features: [
-      "Unlimited quotes",
-      "3 users",
-      "Custom domain",
-      "Advanced analytics dashboard",
-      "Priority support (4h)",
-      "API access",
-      "CRM integrations (HubSpot, Salesforce)",
-      "White-label PDFs",
-      "Custom quote expiry",
-      "Client portal",
+      "Obegränsat antal offerter",
+      "3 användare",
+      "Anpassad domän",
+      "Avancerad analysdashboard",
+      "Prioriterad support (4 h)",
+      "API-åtkomst",
+      "CRM-integrationer (HubSpot, Salesforce)",
+      "White-label PDF:er",
+      "Anpassad offertgiltighet",
+      "Kundportal",
     ],
     notIncluded: [],
-    cta: "Start 14-day free trial",
+    cta: "Starta 14 dagars gratis provperiod",
     ctaHref: "/dashboard",
     highlighted: true,
-    badge: "Most Popular",
+    badge: "Mest populär",
   },
   {
     name: "Business",
-    price: "$99",
-    period: "/month",
-    description: "For agencies and teams that need enterprise features",
+    price: "999 kr",
+    period: "/månad",
+    description: "För byråer och team som behöver enterprise-funktioner",
     features: [
-      "Unlimited quotes",
-      "10 users",
-      "Everything in Pro",
-      "Team collaboration",
-      "Role-based permissions",
-      "Custom approval workflows",
-      "Dedicated account manager",
-      "SSO / SAML login",
-      "Advanced reporting & exports",
-      "Zapier + Make integration",
-      "SLA guarantee",
+      "Obegränsat antal offerter",
+      "10 användare",
+      "Allt i Pro",
+      "Teamsamarbete",
+      "Rollbaserade behörigheter",
+      "Anpassade godkännandeflöden",
+      "Dedikerad kontaktperson",
+      "SSO / SAML-inloggning",
+      "Avancerad rapportering och export",
+      "Zapier + Make-integration",
+      "SLA-garanti",
     ],
     notIncluded: [],
-    cta: "Contact sales",
+    cta: "Kontakta sälj",
     ctaHref: "#contact",
     highlighted: false,
   },
@@ -102,54 +102,54 @@ const pricingTiers = [
 
 const faqs = [
   {
-    question: "Can I change plans at any time?",
-    answer: "Yes, absolutely. You can upgrade or downgrade your plan at any time. Upgrades take effect immediately and you'll be prorated for the remaining billing period. Downgrades take effect at the next billing cycle.",
+    question: "Kan jag byta plan när som helst?",
+    answer: "Ja, absolut. Du kan uppgradera eller nedgradera din plan när som helst. Uppgraderingar träder i kraft omedelbart och du debiteras proportionellt för resterande faktureringsperiod. Nedgraderingar träder i kraft vid nästa faktureringscykel.",
   },
   {
-    question: "Is there a free trial?",
-    answer: "Yes! All paid plans come with a 14-day free trial, no credit card required. You get full access to all features in your chosen plan during the trial.",
+    question: "Finns det en gratis provperiod?",
+    answer: "Ja! Alla betalplaner inkluderar en 14 dagars gratis provperiod, inget kreditkort krävs. Du får full tillgång till alla funktioner i din valda plan under provperioden.",
   },
   {
-    question: "What counts as a 'quote'?",
-    answer: "A quote is any proposal document you create and save. Drafts count toward your monthly limit, but deleted quotes do not. Unused quotes do not carry over to the next month.",
+    question: "Vad räknas som en 'offert'?",
+    answer: "En offert är vilket förlagsdokument du än skapar och sparar. Utkast räknas mot din månadsgräns, men borttagna offerter gör det inte. Oanvända offerter förs inte vidare till nästa månad.",
   },
   {
-    question: "Are e-signatures legally binding?",
-    answer: "Yes. Our e-signature feature complies with the ESIGN Act (USA), eIDAS (EU), and similar regulations worldwide. Each signed document includes an audit trail with timestamps and IP addresses.",
+    question: "Är e-signaturer juridiskt bindande?",
+    answer: "Ja. Vår e-signaturfunktion följer eIDAS (EU), ESIGN Act (USA) och liknande regelverk världen över. Varje signerat dokument inkluderar ett granskningsspår med tidsstämplar och IP-adresser.",
   },
   {
-    question: "Do you offer discounts for annual billing?",
-    answer: "Yes! Switch to annual billing and save 20% on any paid plan. Annual plans are billed upfront for the full year.",
+    question: "Erbjuder ni rabatt för årsbetalning?",
+    answer: "Ja! Byt till årsbetalning och spara 20% på valfri betalplan. Årsplaner faktureras i förväg för hela året.",
   },
   {
-    question: "What integrations are available?",
-    answer: "Offert-pro integrates with HubSpot, Salesforce, QuickBooks, Xero, Slack, Gmail, and more. Pro and Business plans also get Zapier and Make (Integromat) access for custom automations.",
+    question: "Vilka integrationer finns tillgängliga?",
+    answer: "Offert-pro integrerar med HubSpot, Salesforce, QuickBooks, Xero, Slack, Gmail och mer. Pro- och Business-planer får även tillgång till Zapier och Make för anpassade automatiseringar.",
   },
   {
-    question: "Is my data secure?",
-    answer: "Absolutely. We use AES-256 encryption at rest and TLS 1.3 in transit. Our infrastructure is hosted on AWS with SOC 2 Type II compliance. We never share your data with third parties.",
+    question: "Är min data säker?",
+    answer: "Absolut. Vi använder AES-256-kryptering i vila och TLS 1.3 i transit. Vår infrastruktur är hostad på AWS med SOC 2 Type II-efterlevnad. Vi delar aldrig din data med tredje part.",
   },
   {
-    question: "Can I white-label quotes for my clients?",
-    answer: "Pro and Business plans support full white-labeling — your logo, brand colors, custom domain, and no Offert-pro branding visible to your clients.",
+    question: "Kan jag white-label offerter för mina kunder?",
+    answer: "Pro- och Business-planer stöder fullständig white-labeling – din logotyp, varumärkesfärger, anpassad domän och ingen synlig Offert-pro-märkning för dina kunder.",
   },
 ];
 
 const compareFeatures = [
-  { feature: "Quotes per month", free: "5", starter: "25", pro: "Unlimited", business: "Unlimited" },
-  { feature: "Users", free: "1", starter: "1", pro: "3", business: "10" },
-  { feature: "Custom branding", free: false, starter: true, pro: true, business: true },
-  { feature: "PDF export", free: "Basic", starter: "Branded", pro: "White-label", business: "White-label" },
-  { feature: "Real-time tracking", free: false, starter: true, pro: true, business: true },
-  { feature: "E-signatures", free: false, starter: true, pro: true, business: true },
-  { feature: "Auto reminders", free: false, starter: true, pro: true, business: true },
-  { feature: "Analytics", free: false, starter: "Basic", pro: "Advanced", business: "Advanced" },
-  { feature: "Custom domain", free: false, starter: false, pro: true, business: true },
-  { feature: "API access", free: false, starter: false, pro: true, business: true },
-  { feature: "CRM integrations", free: false, starter: false, pro: true, business: true },
+  { feature: "Offerter per månad", free: "5", starter: "25", pro: "Obegränsat", business: "Obegränsat" },
+  { feature: "Användare", free: "1", starter: "1", pro: "3", business: "10" },
+  { feature: "Anpassad profilering", free: false, starter: true, pro: true, business: true },
+  { feature: "PDF-export", free: "Grundläggande", starter: "Profilsatt", pro: "White-label", business: "White-label" },
+  { feature: "Realtidsspårning", free: false, starter: true, pro: true, business: true },
+  { feature: "E-signaturer", free: false, starter: true, pro: true, business: true },
+  { feature: "Automatiska påminnelser", free: false, starter: true, pro: true, business: true },
+  { feature: "Analys", free: false, starter: "Grundläggande", pro: "Avancerad", business: "Avancerad" },
+  { feature: "Anpassad domän", free: false, starter: false, pro: true, business: true },
+  { feature: "API-åtkomst", free: false, starter: false, pro: true, business: true },
+  { feature: "CRM-integrationer", free: false, starter: false, pro: true, business: true },
   { feature: "SSO / SAML", free: false, starter: false, pro: false, business: true },
-  { feature: "Dedicated support", free: false, starter: false, pro: false, business: true },
-  { feature: "Support", free: "Community", starter: "Email (48h)", pro: "Priority (4h)", business: "Dedicated" },
+  { feature: "Dedikerad support", free: false, starter: false, pro: false, business: true },
+  { feature: "Support", free: "Community", starter: "E-post (48 h)", pro: "Prioriterad (4 h)", business: "Dedikerad" },
 ];
 
 function CheckIcon({ className = "w-4 h-4 text-emerald-500" }) {
@@ -179,34 +179,34 @@ export default function PricingPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      {/* Hero */}
+      {/* Hjälte */}
       <section className="pt-24 pb-16 hero-gradient">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-full text-sm font-medium text-indigo-700 mb-6">
-            Simple, transparent pricing
+            Enkla, transparenta priser
           </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
-            Start free. Scale as you grow.
+            Börja gratis. Väx i din takt.
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto mb-8">
-            No hidden fees, no annual lock-in, no surprises. Pick the plan that fits today — upgrade when you&apos;re ready.
+            Inga dolda avgifter, ingen årslock, inga överraskningar. Välj planen som passar idag – uppgradera när du är redo.
           </p>
 
-          {/* Billing toggle (decorative) */}
+          {/* Faktureringsväxlare (dekorativ) */}
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm">
-            <span className="text-sm font-semibold text-gray-700">Monthly</span>
+            <span className="text-sm font-semibold text-gray-700">Månadsvis</span>
             <div className="relative w-12 h-6 bg-indigo-600 rounded-full cursor-pointer">
               <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm" />
             </div>
             <span className="text-sm font-semibold text-indigo-600">
-              Annual
-              <span className="ml-1.5 px-2 py-0.5 text-xs bg-emerald-100 text-emerald-700 rounded-full font-semibold">Save 20%</span>
+              Årsvis
+              <span className="ml-1.5 px-2 py-0.5 text-xs bg-emerald-100 text-emerald-700 rounded-full font-semibold">Spara 20%</span>
             </span>
           </div>
         </div>
       </section>
 
-      {/* Pricing cards */}
+      {/* Priskort */}
       <section className="py-12 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
@@ -286,41 +286,41 @@ export default function PricingPage() {
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-8">
-            All plans include a 14-day free trial on paid tiers. No credit card required.
+            Alla betalplaner inkluderar en 14 dagars gratis provperiod. Inget kreditkort krävs.
           </p>
         </div>
       </section>
 
-      {/* Feature comparison table */}
+      {/* Funktionsjämförelsetabell */}
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-3">
-              Compare all features
+              Jämför alla funktioner
             </h2>
-            <p className="text-gray-500">A detailed look at what&apos;s included in each plan.</p>
+            <p className="text-gray-500">En detaljerad genomgång av vad som ingår i varje plan.</p>
           </div>
 
           <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
           <div className="min-w-[560px] bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            {/* Table header */}
+            {/* Tabellhuvud */}
             <div className="grid grid-cols-5 border-b border-gray-100 bg-gray-50/50">
               <div className="col-span-1 px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Feature
+                Funktion
               </div>
-              {["Free", "Starter", "Pro", "Business"].map((plan) => (
+              {["Gratis", "Starter", "Pro", "Business"].map((plan) => (
                 <div key={plan} className="px-4 py-4 text-center">
                   <span className={`text-sm font-bold ${plan === "Pro" ? "text-indigo-600" : "text-gray-900"}`}>
                     {plan}
                   </span>
                   {plan === "Pro" && (
-                    <span className="block text-xs text-indigo-400 font-medium">Most Popular</span>
+                    <span className="block text-xs text-indigo-400 font-medium">Mest populär</span>
                   )}
                 </div>
               ))}
             </div>
 
-            {/* Table rows */}
+            {/* Tabellrader */}
             {compareFeatures.map((row, index) => (
               <div
                 key={row.feature}
@@ -341,17 +341,17 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
+      {/* FAQ-sektion */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-3">
-              Frequently asked questions
+              Vanliga frågor
             </h2>
             <p className="text-gray-500">
-              Can&apos;t find your answer?{" "}
-              <a href="mailto:hello@offert-pro.com" className="text-indigo-600 hover:underline">
-                Email us
+              Hittar du inte ditt svar?{" "}
+              <a href="mailto:hej@offert-pro.se" className="text-indigo-600 hover:underline">
+                Kontakta oss
               </a>
             </p>
           </div>
@@ -380,27 +380,27 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Testimonials strip */}
+      {/* Omdömesremsa */}
       <section className="py-16 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                quote: "Switched from a $150/month tool to Offert-pro Pro for $49. Better features, better results.",
+                quote: "Bytte från ett verktyg för 1 500 kr/mån till Offert-pro Pro för 499 kr. Bättre funktioner, bättre resultat.",
                 author: "Marcus T.",
                 role: "Blue Ridge Construction",
                 avatar: "MT",
                 bg: "bg-blue-500",
               },
               {
-                quote: "The free plan got me started. Upgraded to Starter the same week — totally worth it.",
+                quote: "Gratisplanen kom igång mig. Uppgraderade till Starter samma vecka – helt värt det.",
                 author: "Priya S.",
                 role: "Pixel Studio",
                 avatar: "PS",
                 bg: "bg-purple-500",
               },
               {
-                quote: "Business plan for my agency was a no-brainer. My whole team uses it daily.",
+                quote: "Business-planen för min byrå var självklar. Hela mitt team använder det dagligen.",
                 author: "Rachel M.",
                 role: "Spark Creative Agency",
                 avatar: "RM",
@@ -435,29 +435,29 @@ export default function PricingPage() {
       <section id="contact" className="py-20 bg-indigo-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 tracking-tight">
-            Ready to get started?
+            Redo att komma igång?
           </h2>
           <p className="text-lg text-indigo-200 mb-8 max-w-xl mx-auto">
-            Join 500+ businesses closing more deals with beautiful proposals. Start free today.
+            Gå med 500+ företag som avslutar fler affärer med snygga offerter. Börja gratis idag.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/dashboard"
               className="w-full sm:w-auto px-8 py-4 text-base font-semibold text-indigo-700 bg-white hover:bg-indigo-50 rounded-2xl transition-all shadow-lg"
             >
-              Start for free — no card needed
+              Kom igång gratis – inget kort krävs
             </Link>
             <a
-              href="mailto:hello@offert-pro.com"
+              href="mailto:hej@offert-pro.se"
               className="w-full sm:w-auto px-8 py-4 text-base font-semibold text-indigo-200 hover:text-white border border-indigo-400 rounded-2xl transition-colors"
             >
-              Talk to sales
+              Prata med sälj
             </a>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Sidfot */}
       <footer className="bg-gray-900 text-gray-400 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -469,11 +469,11 @@ export default function PricingPage() {
               </div>
               <span className="text-sm font-bold text-white">Offert-pro</span>
             </div>
-            <p className="text-sm">© 2026 Offert-pro, Inc. All rights reserved.</p>
+            <p className="text-sm">© 2026 Offert-pro, Inc. Alla rättigheter förbehållna.</p>
             <div className="flex items-center gap-4 text-sm">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
-              <Link href="#" className="hover:text-white transition-colors">Terms</Link>
+              <Link href="/" className="hover:text-white transition-colors">Hem</Link>
+              <Link href="#" className="hover:text-white transition-colors">Integritetspolicy</Link>
+              <Link href="#" className="hover:text-white transition-colors">Användarvillkor</Link>
             </div>
           </div>
         </div>

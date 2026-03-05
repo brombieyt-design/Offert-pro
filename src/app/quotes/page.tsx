@@ -21,18 +21,18 @@ interface Quote {
 }
 
 const allQuotes: Quote[] = [
-  { id: "QT-001", client: "Sarah Chen", clientInitial: "S", company: "Acme Corp", amount: "$4,200", amountRaw: 4200, status: "accepted", date: "Mar 1, 2026", expiry: "Mar 31, 2026", email: "sarah@acmecorp.com" },
-  { id: "QT-002", client: "Tom Watts", clientInitial: "T", company: "Pixel Studio", amount: "$2,800", amountRaw: 2800, status: "opened", date: "Mar 2, 2026", expiry: "Apr 1, 2026", email: "tom@pixelstudio.io" },
-  { id: "QT-003", client: "Anna Lee", clientInitial: "A", company: "Summit IT", amount: "$8,500", amountRaw: 8500, status: "sent", date: "Mar 2, 2026", expiry: "Apr 2, 2026", email: "anna@summittech.com" },
-  { id: "QT-004", client: "Mike Rossi", clientInitial: "M", company: "Nova Consulting", amount: "$1,950", amountRaw: 1950, status: "draft", date: "Mar 3, 2026", expiry: "Apr 3, 2026", email: "mike@novaconsult.co" },
-  { id: "QT-005", client: "James Hill", clientInitial: "J", company: "Blue Ridge Construction", amount: "$12,400", amountRaw: 12400, status: "accepted", date: "Feb 28, 2026", expiry: "Mar 28, 2026", email: "james@blueridge.build" },
-  { id: "QT-006", client: "Laura Kim", clientInitial: "L", company: "Evergreen Events", amount: "$3,100", amountRaw: 3100, status: "declined", date: "Feb 27, 2026", expiry: "Mar 27, 2026", email: "laura@evergreen.co" },
-  { id: "QT-007", client: "David Park", clientInitial: "D", company: "Horizon Media", amount: "$6,750", amountRaw: 6750, status: "sent", date: "Feb 26, 2026", expiry: "Mar 26, 2026", email: "david@horizonmedia.com" },
-  { id: "QT-008", client: "Emma Torres", clientInitial: "E", company: "Bright Digital", amount: "$2,200", amountRaw: 2200, status: "accepted", date: "Feb 25, 2026", expiry: "Mar 25, 2026", email: "emma@brightdigital.io" },
-  { id: "QT-009", client: "Ryan Foster", clientInitial: "R", company: "PineCone Agency", amount: "$4,900", amountRaw: 4900, status: "opened", date: "Feb 24, 2026", expiry: "Mar 24, 2026", email: "ryan@pinecone.agency" },
-  { id: "QT-010", client: "Jessica Lane", clientInitial: "J", company: "Alpine Builders", amount: "$15,000", amountRaw: 15000, status: "draft", date: "Feb 23, 2026", expiry: "Mar 23, 2026", email: "jess@alpinebuilders.com" },
-  { id: "QT-011", client: "Carlos Vega", clientInitial: "C", company: "Vega Solutions", amount: "$3,600", amountRaw: 3600, status: "accepted", date: "Feb 22, 2026", expiry: "Mar 22, 2026", email: "carlos@vegasolutions.mx" },
-  { id: "QT-012", client: "Nina Patel", clientInitial: "N", company: "Spark Creative", amount: "$1,200", amountRaw: 1200, status: "declined", date: "Feb 20, 2026", expiry: "Mar 20, 2026", email: "nina@sparkcreative.in" },
+  { id: "QT-001", client: "Sarah Chen", clientInitial: "S", company: "Acme Corp", amount: "4 200 kr", amountRaw: 4200, status: "accepted", date: "1 mar 2026", expiry: "31 mar 2026", email: "sarah@acmecorp.com" },
+  { id: "QT-002", client: "Tom Watts", clientInitial: "T", company: "Pixel Studio", amount: "2 800 kr", amountRaw: 2800, status: "opened", date: "2 mar 2026", expiry: "1 apr 2026", email: "tom@pixelstudio.io" },
+  { id: "QT-003", client: "Anna Lee", clientInitial: "A", company: "Summit IT", amount: "8 500 kr", amountRaw: 8500, status: "sent", date: "2 mar 2026", expiry: "2 apr 2026", email: "anna@summittech.com" },
+  { id: "QT-004", client: "Mike Rossi", clientInitial: "M", company: "Nova Consulting", amount: "1 950 kr", amountRaw: 1950, status: "draft", date: "3 mar 2026", expiry: "3 apr 2026", email: "mike@novaconsult.co" },
+  { id: "QT-005", client: "James Hill", clientInitial: "J", company: "Blue Ridge Construction", amount: "12 400 kr", amountRaw: 12400, status: "accepted", date: "28 feb 2026", expiry: "28 mar 2026", email: "james@blueridge.build" },
+  { id: "QT-006", client: "Laura Kim", clientInitial: "L", company: "Evergreen Events", amount: "3 100 kr", amountRaw: 3100, status: "declined", date: "27 feb 2026", expiry: "27 mar 2026", email: "laura@evergreen.co" },
+  { id: "QT-007", client: "David Park", clientInitial: "D", company: "Horizon Media", amount: "6 750 kr", amountRaw: 6750, status: "sent", date: "26 feb 2026", expiry: "26 mar 2026", email: "david@horizonmedia.com" },
+  { id: "QT-008", client: "Emma Torres", clientInitial: "E", company: "Bright Digital", amount: "2 200 kr", amountRaw: 2200, status: "accepted", date: "25 feb 2026", expiry: "25 mar 2026", email: "emma@brightdigital.io" },
+  { id: "QT-009", client: "Ryan Foster", clientInitial: "R", company: "PineCone Agency", amount: "4 900 kr", amountRaw: 4900, status: "opened", date: "24 feb 2026", expiry: "24 mar 2026", email: "ryan@pinecone.agency" },
+  { id: "QT-010", client: "Jessica Lane", clientInitial: "J", company: "Alpine Builders", amount: "15 000 kr", amountRaw: 15000, status: "draft", date: "23 feb 2026", expiry: "23 mar 2026", email: "jess@alpinebuilders.com" },
+  { id: "QT-011", client: "Carlos Vega", clientInitial: "C", company: "Vega Solutions", amount: "3 600 kr", amountRaw: 3600, status: "accepted", date: "22 feb 2026", expiry: "22 mar 2026", email: "carlos@vegasolutions.mx" },
+  { id: "QT-012", client: "Nina Patel", clientInitial: "N", company: "Spark Creative", amount: "1 200 kr", amountRaw: 1200, status: "declined", date: "20 feb 2026", expiry: "20 mar 2026", email: "nina@sparkcreative.in" },
 ];
 
 const clientColors: Record<string, string> = {
@@ -42,13 +42,21 @@ const clientColors: Record<string, string> = {
 };
 
 const tabs = [
-  { label: "All", value: "all" },
-  { label: "Draft", value: "draft" },
-  { label: "Sent", value: "sent" },
-  { label: "Opened", value: "opened" },
-  { label: "Accepted", value: "accepted" },
-  { label: "Declined", value: "declined" },
+  { label: "Alla", value: "all" },
+  { label: "Utkast", value: "draft" },
+  { label: "Skickad", value: "sent" },
+  { label: "Öppnad", value: "opened" },
+  { label: "Accepterad", value: "accepted" },
+  { label: "Avvisad", value: "declined" },
 ];
+
+const statusLabel: Record<QuoteStatus, string> = {
+  draft: "Utkast",
+  sent: "Skickad",
+  opened: "Öppnad",
+  accepted: "Accepterad",
+  declined: "Avvisad",
+};
 
 const ITEMS_PER_PAGE = 8;
 
@@ -88,11 +96,11 @@ export default function QuotesPage() {
   return (
     <AppLayout>
       <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-        {/* Header */}
+        {/* Sidhuvud */}
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Quotes</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{allQuotes.length} quotes total</p>
+            <h1 className="text-2xl font-bold text-gray-900">Offerter</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{allQuotes.length} offerter totalt</p>
           </div>
           <Link
             href="/quotes/new"
@@ -101,13 +109,13 @@ export default function QuotesPage() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
             </svg>
-            New Quote
+            Ny offert
           </Link>
         </div>
 
-        {/* Filters */}
+        {/* Filter */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
-          {/* Tabs */}
+          {/* Flikar */}
           <div className="flex items-center gap-1 px-4 pt-4 border-b border-gray-100 overflow-x-auto">
             {tabCounts.map((tab) => (
               <button
@@ -129,7 +137,7 @@ export default function QuotesPage() {
             ))}
           </div>
 
-          {/* Search + sort */}
+          {/* Sök + sortera */}
           <div className="px-4 py-3 flex flex-wrap items-center gap-2">
             <div className="relative flex-1 min-w-0" style={{ minWidth: "180px" }}>
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -154,25 +162,25 @@ export default function QuotesPage() {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                <span className="hidden sm:inline">Export</span>
+                <span className="hidden sm:inline">Exportera</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Table */}
+        {/* Tabell */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3.5">Quote</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Client</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Amount</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3.5">Offert</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Kund</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Belopp</th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Status</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Sent</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Expiry</th>
-                  <th className="text-right text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3.5">Actions</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Skickad</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Utgångsdatum</th>
+                  <th className="text-right text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3.5">Åtgärder</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -185,8 +193,8 @@ export default function QuotesPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                         </div>
-                        <p className="text-sm font-medium text-gray-500">No quotes found</p>
-                        <p className="text-xs text-gray-400">Try adjusting your search or filters</p>
+                        <p className="text-sm font-medium text-gray-500">Inga offerter hittades</p>
+                        <p className="text-xs text-gray-400">Prova att justera din sökning eller ditt filter</p>
                       </div>
                     </td>
                   </tr>
@@ -212,7 +220,7 @@ export default function QuotesPage() {
                       </td>
                       <td className="px-3 py-4">
                         <Badge variant={quote.status} dot>
-                          {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
+                          {statusLabel[quote.status]}
                         </Badge>
                       </td>
                       <td className="px-3 py-4">
@@ -223,23 +231,23 @@ export default function QuotesPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-1">
-                          <button className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Preview">
+                          <button className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Förhandsgranska">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                           </button>
-                          <button className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Edit">
+                          <button className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Redigera">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                           </button>
-                          <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Send">
+                          <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Skicka">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                             </svg>
                           </button>
-                          <button className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Delete">
+                          <button className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Ta bort">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
@@ -253,11 +261,11 @@ export default function QuotesPage() {
             </table>
           </div>
 
-          {/* Pagination */}
+          {/* Sidnumrering */}
           {totalPages > 1 && (
             <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
               <p className="text-sm text-gray-500">
-                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} quotes
+                Visar {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} av {filtered.length} offerter
               </p>
               <div className="flex items-center gap-1">
                 <button
