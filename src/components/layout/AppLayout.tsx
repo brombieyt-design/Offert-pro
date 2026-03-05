@@ -12,7 +12,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    label: "Dashboard",
+    label: "Översikt",
     href: "/dashboard",
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -21,7 +21,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: "Quotes",
+    label: "Offerter",
     href: "/quotes",
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -30,7 +30,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: "Templates",
+    label: "Mallar",
     href: "/templates",
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -39,7 +39,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: "Clients",
+    label: "Kunder",
     href: "/clients",
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -48,7 +48,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: "Analytics",
+    label: "Analys",
     href: "/analytics",
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -57,7 +57,7 @@ const navItems: NavItem[] = [
     ),
   },
   {
-    label: "Settings",
+    label: "Inställningar",
     href: "/settings",
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -78,7 +78,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
-      {/* Mobile overlay */}
+      {/* Mobilöverlägg */}
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 z-20 bg-black/40 lg:hidden"
@@ -86,7 +86,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidopanel */}
       <aside
         className={`
           fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-100 flex flex-col
@@ -95,7 +95,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
-        {/* Logo */}
+        {/* Logotyp */}
         <div className="flex items-center gap-2.5 px-6 py-5 border-b border-gray-100">
           <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
             <svg className="w-4.5 h-4.5 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -128,10 +128,10 @@ export function AppLayout({ children }: AppLayoutProps) {
           })}
         </nav>
 
-        {/* Upgrade prompt */}
+        {/* Uppgraderingsruta */}
         <div className="mx-3 mb-3 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
-          <p className="text-xs font-semibold text-indigo-700 mb-0.5">Free Plan</p>
-          <p className="text-xs text-indigo-500 mb-3">3 of 5 quotes used this month</p>
+          <p className="text-xs font-semibold text-indigo-700 mb-0.5">Gratisplan</p>
+          <p className="text-xs text-indigo-500 mb-3">3 av 5 offerter använda denna månad</p>
           <div className="w-full bg-indigo-200 rounded-full h-1.5 mb-3">
             <div className="bg-indigo-600 h-1.5 rounded-full" style={{ width: "60%" }} />
           </div>
@@ -139,11 +139,11 @@ export function AppLayout({ children }: AppLayoutProps) {
             href="/pricing"
             className="block w-full text-center text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg py-2 transition-colors"
           >
-            Upgrade to Pro
+            Uppgradera till Pro
           </Link>
         </div>
 
-        {/* User profile */}
+        {/* Användarprofil */}
         <div className="px-3 pb-4 border-t border-gray-100 pt-3">
           <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold shrink-0">
@@ -160,11 +160,11 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
       </aside>
 
-      {/* Main content */}
+      {/* Huvudinnehåll */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
+        {/* Topprad */}
         <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-4">
-          {/* Mobile menu button */}
+          {/* Mobilmenyknapp */}
           <button
             className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
             onClick={() => setMobileMenuOpen(true)}
@@ -174,7 +174,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </svg>
           </button>
 
-          {/* Search */}
+          {/* Sök */}
           <div className="flex-1 max-w-md">
             <div className="relative">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -182,14 +182,14 @@ export function AppLayout({ children }: AppLayoutProps) {
               </svg>
               <input
                 type="text"
-                placeholder="Search quotes, clients..."
+                placeholder="Sök offerter, kunder..."
                 className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-indigo-400 focus:bg-white transition-colors placeholder:text-gray-400"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-2 ml-auto">
-            {/* Notifications */}
+            {/* Notiser */}
             <button className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -197,7 +197,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
             </button>
 
-            {/* Help */}
+            {/* Hjälp */}
             <button className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -206,7 +206,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </div>
         </header>
 
-        {/* Page content */}
+        {/* Sidinnehåll */}
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>

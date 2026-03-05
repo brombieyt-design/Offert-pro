@@ -23,7 +23,7 @@ export function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+          {/* Logotyp */}
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
               <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
@@ -33,36 +33,36 @@ export function Navbar() {
             <span className="text-xl font-bold text-gray-900 tracking-tight">Offert-pro</span>
           </Link>
 
-          {/* Desktop nav */}
+          {/* Desktopmeny */}
           <nav className="hidden md:flex items-center gap-1">
             <Link href="/#features" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
-              Features
+              Funktioner
             </Link>
             <Link href="/pricing" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
-              Pricing
+              Priser
             </Link>
             <Link href="/#about" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
-              About
+              Om oss
             </Link>
           </nav>
 
-          {/* Desktop CTAs */}
+          {/* Desktop CTA-knappar */}
           <div className="hidden md:flex items-center gap-3">
             <Link
               href="/dashboard"
               className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
             >
-              Login
+              Logga in
             </Link>
             <Link
               href="/dashboard"
               className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-sm shadow-indigo-200"
             >
-              Start free
+              Kom igång gratis
             </Link>
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobilmenyknapp */}
           <button
             className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -80,25 +80,25 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobilmeny */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
           <div className="px-4 py-4 space-y-1">
             <Link href="/#features" className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors" onClick={() => setMobileMenuOpen(false)}>
-              Features
+              Funktioner
             </Link>
             <Link href="/pricing" className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors" onClick={() => setMobileMenuOpen(false)}>
-              Pricing
+              Priser
             </Link>
             <Link href="/#about" className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors" onClick={() => setMobileMenuOpen(false)}>
-              About
+              Om oss
             </Link>
             <div className="pt-2 border-t border-gray-100 flex flex-col gap-2">
               <Link href="/dashboard" className="px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-lg transition-colors text-center" onClick={() => setMobileMenuOpen(false)}>
-                Login
+                Logga in
               </Link>
               <Link href="/dashboard" className="px-4 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors text-center" onClick={() => setMobileMenuOpen(false)}>
-                Start free
+                Kom igång gratis
               </Link>
             </div>
           </div>

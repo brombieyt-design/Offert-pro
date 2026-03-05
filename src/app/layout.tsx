@@ -2,21 +2,21 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Offert-pro – Beautiful Quotes & Proposals for Small Businesses",
+  title: "Offert-pro – Vackra offerter och anbud för småföretag",
   description:
-    "Create stunning, professional quotes and proposals in minutes. Track opens, collect e-signatures, and close more deals with Offert-pro.",
+    "Skapa professionella offerter på minuter. Spåra öppningar, samla e-signaturer och vinn fler affärer med Offert-pro.",
   keywords: [
-    "quotation software",
-    "proposal tool",
-    "small business quotes",
-    "e-signature",
-    "invoice software",
+    "offertsystem",
+    "offertsoftware",
+    "offertverktyg småföretag",
+    "e-signatur",
+    "faktureringsprogram",
   ],
   authors: [{ name: "Offert-pro" }],
   openGraph: {
-    title: "Offert-pro – Close More Deals with Beautiful Quotes",
+    title: "Offert-pro – Vinn fler affärer med vackra offerter",
     description:
-      "Create stunning proposals, track client engagement, and get e-signatures — all in one place.",
+      "Skapa professionella offerter, spåra kundengagemang och samla e-signaturer – allt på ett ställe.",
     type: "website",
   },
 };
@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="sv">
       <body className="antialiased">{children}</body>
     </html>
   );
