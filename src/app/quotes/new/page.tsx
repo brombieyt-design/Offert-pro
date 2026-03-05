@@ -73,6 +73,10 @@ export default function NewQuotePage() {
   const [sent, setSent] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [shareLink, setShareLink] = useState<string | null>(null);
+  const [rotEnabled, setRotEnabled] = useState(false);
+  const [rotType, setRotType] = useState<"rot" | "rut">("rot");
+  const [laborAmount, setLaborAmount] = useState(0);
+  const [personnummer, setPersonnummer] = useState("");
 
   const subtotal = lineItems.reduce(
     (sum, item) => sum + item.qty * item.unitPrice,
@@ -80,6 +84,10 @@ export default function NewQuotePage() {
   );
   const tax = subtotal * (taxRate / 100);
   const total = subtotal + tax;
+  const rotRate = rotType === "rot" ? 0.30 : 0.50;
+  const rotMax = rotType === "rot" ? 50000 : 75000;
+  const rotDeduction = rotEnabled ? Math.min(Math.round(laborAmount * rotRate), rotMax) : 0;
+  const customerPays = total - rotDeduction;
 
   const updateLineItem = (
     id: string,
@@ -505,28 +513,107 @@ export default function NewQuotePage() {
               onClick={addLineItem}
               className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors mb-6"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M12 4v16m8-8H4"
-                />
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
               </svg>
               Lägg till rad
             </button>
 
+            {/* ROT/RUT-avdrag */}
+            <div className="mb-6 border border-gray-200 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setRotEnabled((v) => !v)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${rotEnabled ? "bg-indigo-600 border-indigo-600" : "border-gray-300"}`}>
+                    {rotEnabled && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                  </div>
+                  <span className="text-sm font-semibold text-gray-800">ROT- eller RUT-avdrag</span>
+                  <span className="hidden sm:inline text-xs text-gray-400 bg-white border border-gray-200 rounded-full px-2 py-0.5">Skatteverket-avdrag på arbetskostnad</span>
+                </div>
+                <svg className={`w-4 h-4 text-gray-400 transition-transform ${rotEnabled ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {rotEnabled && (
+                <div className="p-4 space-y-4 border-t border-gray-100 bg-white">
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Typ av avdrag</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(["rot", "rut"] as const).map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => setRotType(t)}
+                          className={`p-3 rounded-xl border-2 text-left transition-all ${rotType === t ? "border-indigo-500 bg-indigo-50" : "border-gray-200 hover:border-indigo-200"}`}
+                        >
+                          <p className="text-sm font-bold text-gray-900 uppercase">{t}-avdrag</p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {t === "rot" ? "30% av arbete, max 50 000 kr/år" : "50% av arbete, max 75 000 kr/år"}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {t === "rot" ? "Bygg, renovering, reparation" : "Städ, tvätt, barnpassning, trädgård"}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Arbetskostnad (exkl. moms) *</label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min={0}
+                          value={laborAmount || ""}
+                          onChange={(e) => setLaborAmount(Number(e.target.value))}
+                          placeholder="0"
+                          className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 pr-10"
+                        />
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400">kr</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">Enbart den del som avser arbete (ej material)</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Kundens personnummer *</label>
+                      <input
+                        type="text"
+                        value={personnummer}
+                        onChange={(e) => setPersonnummer(e.target.value)}
+                        placeholder="ÅÅMMDD-XXXX"
+                        className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                      />
+                      <p className="text-xs text-gray-400 mt-1">Krävs för ansökan hos Skatteverket</p>
+                    </div>
+                  </div>
+
+                  {laborAmount > 0 && (
+                    <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-emerald-800">
+                          {rotType.toUpperCase()}-avdrag: {formatSEK(rotDeduction)}
+                        </p>
+                        <p className="text-xs text-emerald-600 mt-0.5">
+                          {rotType === "rot" ? "30%" : "50%"} × {formatSEK(laborAmount)}
+                          {rotDeduction === rotMax ? ` (begränsat till max ${formatSEK(rotMax)})` : ""}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-emerald-600">Kunden betalar</p>
+                        <p className="text-lg font-bold text-emerald-700">{formatSEK(customerPays)}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div className="border-t border-gray-100 pt-4 space-y-2 max-w-xs ml-auto">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Delsumma</span>
-                <span className="font-medium text-gray-900">
-                  {formatSEK(subtotal)}
-                </span>
+                <span className="font-medium text-gray-900">{formatSEK(subtotal)}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <div className="flex items-center gap-2">
@@ -537,22 +624,35 @@ export default function NewQuotePage() {
                       min="0"
                       max="100"
                       value={taxRate}
-                      onChange={(e) =>
-                        setTaxRate(parseFloat(e.target.value) || 0)
-                      }
+                      onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
                       className="w-10 text-xs border border-gray-200 rounded px-1 py-0.5 text-center focus:outline-none focus:border-indigo-400"
                     />
                     <span className="text-gray-400 text-xs">%</span>
                   </div>
                 </div>
-                <span className="font-medium text-gray-900">
-                  {formatSEK(tax)}
-                </span>
+                <span className="font-medium text-gray-900">{formatSEK(tax)}</span>
               </div>
-              <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-100">
-                <span className="text-gray-900">Totalt</span>
-                <span className="text-indigo-600">{formatSEK(total)}</span>
-              </div>
+              {rotEnabled && rotDeduction > 0 ? (
+                <>
+                  <div className="flex justify-between text-sm pt-2 border-t border-gray-100">
+                    <span className="font-bold text-gray-900">Totalt (inkl. moms)</span>
+                    <span className="font-medium text-gray-900">{formatSEK(total)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-emerald-700">
+                    <span>{rotType.toUpperCase()}-avdrag</span>
+                    <span className="font-semibold">− {formatSEK(rotDeduction)}</span>
+                  </div>
+                  <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-100">
+                    <span className="text-gray-900">Kunden betalar</span>
+                    <span className="text-indigo-600">{formatSEK(customerPays)}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-100">
+                  <span className="text-gray-900">Totalt</span>
+                  <span className="text-indigo-600">{formatSEK(total)}</span>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -699,10 +799,30 @@ export default function NewQuotePage() {
                   <span className="text-gray-500">Moms ({taxRate}%)</span>
                   <span className="text-gray-900">{formatSEK(tax)}</span>
                 </div>
-                <div className="flex justify-between text-base font-extrabold pt-2 border-t border-gray-200">
-                  <span className="text-gray-900">Att betala</span>
-                  <span className="text-indigo-600">{formatSEK(total)}</span>
-                </div>
+                {rotEnabled && rotDeduction > 0 ? (
+                  <>
+                    <div className="flex justify-between text-sm font-bold pt-2 border-t border-gray-200">
+                      <span className="text-gray-900">Totalt (inkl. moms)</span>
+                      <span className="text-gray-900">{formatSEK(total)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-emerald-700">
+                      <span>{rotType.toUpperCase()}-avdrag ({rotType === "rot" ? "30%" : "50%"})</span>
+                      <span className="font-semibold">− {formatSEK(rotDeduction)}</span>
+                    </div>
+                    <div className="flex justify-between text-base font-extrabold pt-2 border-t border-gray-200">
+                      <span className="text-gray-900">Kunden betalar</span>
+                      <span className="text-indigo-600">{formatSEK(customerPays)}</span>
+                    </div>
+                    <p className="text-xs text-gray-400">
+                      Vi ansöker om {formatSEK(rotDeduction)} hos Skatteverket
+                    </p>
+                  </>
+                ) : (
+                  <div className="flex justify-between text-base font-extrabold pt-2 border-t border-gray-200">
+                    <span className="text-gray-900">Att betala</span>
+                    <span className="text-indigo-600">{formatSEK(total)}</span>
+                  </div>
+                )}
               </div>
 
               {clientInfo.notes && (

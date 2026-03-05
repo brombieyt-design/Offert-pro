@@ -114,6 +114,10 @@ export default function NewInvoicePage() {
   const [sent, setSent] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [shareLink, setShareLink] = useState<string | null>(null);
+  const [rotEnabled, setRotEnabled] = useState(false);
+  const [rotType, setRotType] = useState<"rot" | "rut">("rot");
+  const [laborAmount, setLaborAmount] = useState(0);
+  const [personnummer, setPersonnummer] = useState("");
 
   const [client, setClient] = useState<ClientInfo>({
     name: "", email: "", phone: "", company: "",
@@ -128,6 +132,10 @@ export default function NewInvoicePage() {
   const subtotal = items.reduce((s, i) => s + i.qty * i.unitPrice, 0);
   const tax = Math.round(subtotal * (taxRate / 100));
   const total = subtotal + tax;
+  const rotRate = rotType === "rot" ? 0.30 : 0.50;
+  const rotMax = rotType === "rot" ? 50000 : 75000;
+  const rotDeduction = rotEnabled ? Math.min(Math.round(laborAmount * rotRate), rotMax) : 0;
+  const customerPays = total - rotDeduction;
 
   // ------- handlers -------
 
@@ -344,10 +352,107 @@ export default function NewInvoicePage() {
               Lägg till rad
             </button>
 
+            {/* ROT/RUT-avdrag */}
+            <div className="mb-6 border border-gray-200 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setRotEnabled((v) => !v)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${rotEnabled ? "bg-indigo-600 border-indigo-600" : "border-gray-300"}`}>
+                    {rotEnabled && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                  </div>
+                  <span className="text-sm font-semibold text-gray-800">ROT- eller RUT-avdrag</span>
+                  <span className="hidden sm:inline text-xs text-gray-400 bg-white border border-gray-200 rounded-full px-2 py-0.5">Skatteverket-avdrag på arbetskostnad</span>
+                </div>
+                <svg className={`w-4 h-4 text-gray-400 transition-transform ${rotEnabled ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {rotEnabled && (
+                <div className="p-4 space-y-4 border-t border-gray-100 bg-white">
+                  {/* ROT / RUT väljare */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Typ av avdrag</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(["rot", "rut"] as const).map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => setRotType(t)}
+                          className={`p-3 rounded-xl border-2 text-left transition-all ${rotType === t ? "border-indigo-500 bg-indigo-50" : "border-gray-200 hover:border-indigo-200"}`}
+                        >
+                          <p className="text-sm font-bold text-gray-900 uppercase">{t}-avdrag</p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {t === "rot" ? "30% av arbete, max 50 000 kr/år" : "50% av arbete, max 75 000 kr/år"}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {t === "rot" ? "Bygg, renovering, reparation" : "Städ, tvätt, barnpassning, trädgård"}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Arbetskostnad (exkl. moms) *
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min={0}
+                          max={subtotal}
+                          value={laborAmount || ""}
+                          onChange={(e) => setLaborAmount(Number(e.target.value))}
+                          placeholder="0"
+                          className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 pr-10"
+                        />
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400">kr</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">Enbart den del som avser arbete (ej material)</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Kundens personnummer *
+                      </label>
+                      <input
+                        type="text"
+                        value={personnummer}
+                        onChange={(e) => setPersonnummer(e.target.value)}
+                        placeholder="ÅÅMMDD-XXXX"
+                        className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                      />
+                      <p className="text-xs text-gray-400 mt-1">Krävs för ansökan hos Skatteverket</p>
+                    </div>
+                  </div>
+
+                  {laborAmount > 0 && (
+                    <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-emerald-800">
+                          {rotType.toUpperCase()}-avdrag: {formatSEK(rotDeduction)}
+                        </p>
+                        <p className="text-xs text-emerald-600 mt-0.5">
+                          {rotType === "rot" ? "30%" : "50%"} × {formatSEK(laborAmount)}
+                          {rotDeduction === rotMax ? ` (begränsat till max ${formatSEK(rotMax)})` : ""}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-emerald-600">Kunden betalar</p>
+                        <p className="text-lg font-bold text-emerald-700">{formatSEK(customerPays)}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Summering */}
             <div className="border-t border-gray-100 pt-5">
               <div className="flex justify-end">
-                <div className="w-64 space-y-2.5">
+                <div className="w-72 space-y-2.5">
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Delsumma (exkl. moms)</span>
                     <span className="font-medium">{formatSEK(subtotal)}</span>
@@ -357,9 +462,27 @@ export default function NewInvoicePage() {
                     <span className="font-medium">{formatSEK(tax)}</span>
                   </div>
                   <div className="flex justify-between pt-2.5 border-t border-gray-200">
-                    <span className="font-bold text-gray-900">Att betala</span>
-                    <span className="font-bold text-indigo-600 text-lg">{formatSEK(total)}</span>
+                    <span className="font-bold text-gray-900">Totalt (inkl. moms)</span>
+                    <span className="font-bold text-gray-900">{formatSEK(total)}</span>
                   </div>
+                  {rotEnabled && rotDeduction > 0 && (
+                    <>
+                      <div className="flex justify-between text-sm text-emerald-700">
+                        <span>{rotType.toUpperCase()}-avdrag ({rotType === "rot" ? "30%" : "50%"} av arbete)</span>
+                        <span className="font-semibold">− {formatSEK(rotDeduction)}</span>
+                      </div>
+                      <div className="flex justify-between pt-2.5 border-t-2 border-gray-200">
+                        <span className="font-bold text-gray-900">Kunden betalar</span>
+                        <span className="font-bold text-indigo-600 text-lg">{formatSEK(customerPays)}</span>
+                      </div>
+                    </>
+                  )}
+                  {(!rotEnabled || rotDeduction === 0) && (
+                    <div className="flex justify-between pt-2.5 border-t border-gray-200">
+                      <span className="font-bold text-gray-900">Att betala</span>
+                      <span className="font-bold text-indigo-600 text-lg">{formatSEK(total)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -455,17 +578,37 @@ export default function NewInvoicePage() {
 
               {/* Totalsummor */}
               <div className="flex justify-end mb-6">
-                <div className="w-64 space-y-2">
+                <div className="w-72 space-y-2">
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Delsumma</span><span>{formatSEK(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Moms ({taxRate}%)</span><span>{formatSEK(tax)}</span>
                   </div>
-                  <div className="flex justify-between pt-2.5 border-t-2 border-gray-200">
-                    <span className="font-bold text-gray-900">Att betala</span>
-                    <span className="font-bold text-indigo-600 text-lg">{formatSEK(total)}</span>
-                  </div>
+                  {rotEnabled && rotDeduction > 0 ? (
+                    <>
+                      <div className="flex justify-between text-sm text-gray-600 pt-2.5 border-t border-gray-200">
+                        <span className="font-bold text-gray-900">Totalt (inkl. moms)</span>
+                        <span className="font-medium">{formatSEK(total)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-emerald-700">
+                        <span>{rotType.toUpperCase()}-avdrag ({rotType === "rot" ? "30%" : "50%"} av arbete)</span>
+                        <span className="font-semibold">− {formatSEK(rotDeduction)}</span>
+                      </div>
+                      <div className="flex justify-between pt-2.5 border-t-2 border-gray-200">
+                        <span className="font-bold text-gray-900">Kunden betalar</span>
+                        <span className="font-bold text-indigo-600 text-lg">{formatSEK(customerPays)}</span>
+                      </div>
+                      <p className="text-xs text-gray-400">
+                        Vi ansöker om {formatSEK(rotDeduction)} hos Skatteverket (personnr: {personnummer || "—"})
+                      </p>
+                    </>
+                  ) : (
+                    <div className="flex justify-between pt-2.5 border-t-2 border-gray-200">
+                      <span className="font-bold text-gray-900">Att betala</span>
+                      <span className="font-bold text-indigo-600 text-lg">{formatSEK(total)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
