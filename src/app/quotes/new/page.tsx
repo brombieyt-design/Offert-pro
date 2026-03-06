@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { type Client, loadClients } from "@/lib/clients";
 
 interface LineItem {
   id: string;
@@ -77,6 +78,38 @@ export default function NewQuotePage() {
   const [rotType, setRotType] = useState<"rot" | "rut">("rot");
   const [laborAmount, setLaborAmount] = useState(0);
   const [personnummer, setPersonnummer] = useState("");
+
+  // Client picker
+  const [savedClients, setSavedClients] = useState<Client[]>([]);
+  const [clientSearch, setClientSearch] = useState("");
+  const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    setSavedClients(loadClients());
+  }, []);
+
+  const filteredClients = savedClients.filter((c) => {
+    const q = clientSearch.toLowerCase();
+    return (
+      c.name.toLowerCase().includes(q) ||
+      c.company.toLowerCase().includes(q) ||
+      c.email.toLowerCase().includes(q)
+    );
+  });
+
+  const pickClient = (c: Client) => {
+    setClientInfo({
+      name: c.name,
+      email: c.email,
+      phone: c.phone,
+      company: c.company,
+      address: c.address,
+      city: c.city,
+      notes: c.notes,
+    });
+    setClientSearch(c.name);
+    setClientDropdownOpen(false);
+  };
 
   const subtotal = lineItems.reduce(
     (sum, item) => sum + item.qty * item.unitPrice,
@@ -287,7 +320,53 @@ export default function NewQuotePage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-1">
               Kundinformation
             </h2>
-            <p className="text-sm text-gray-500 mb-6">Vem är offerten till?</p>
+            <p className="text-sm text-gray-500 mb-5">Vem är offerten till?</p>
+
+            {/* Välj befintlig kund */}
+            <div className="mb-6 relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Välj befintlig kund
+                <span className="ml-2 text-xs font-normal text-gray-400">(eller fyll i manuellt nedan)</span>
+              </label>
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={clientSearch}
+                  onChange={(e) => { setClientSearch(e.target.value); setClientDropdownOpen(true); }}
+                  onFocus={() => setClientDropdownOpen(true)}
+                  placeholder="Sök bland sparade kunder..."
+                  className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all"
+                />
+              </div>
+              {clientDropdownOpen && filteredClients.length > 0 && (
+                <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-56 overflow-y-auto">
+                  {filteredClients.map((c) => (
+                    <button
+                      key={c.id}
+                      onMouseDown={() => pickClient(c)}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-indigo-50 text-left transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                        {c.name.charAt(0)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{c.name}</p>
+                        <p className="text-xs text-gray-400 truncate">{c.company || c.email}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {clientDropdownOpen && clientSearch && filteredClients.length === 0 && (
+                <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-center">
+                  <p className="text-sm text-gray-500">Ingen kund hittades</p>
+                  <a href="/clients" className="text-xs text-indigo-600 hover:underline mt-1 inline-block">Lägg till kund i kundregistret →</a>
+                </div>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
