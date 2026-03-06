@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { type Client, loadClients } from "@/lib/clients";
+import { addQuote, generateQuoteNumber, updateQuote } from "@/lib/quotes";
+import { loadTemplates, type Template } from "@/lib/templates";
 
 interface LineItem {
   id: string;
@@ -55,13 +58,17 @@ function formatSEK(amount: number) {
 }
 
 export default function NewQuotePage() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [clientInfo, setClientInfo] = useState<ClientInfo>(defaultClientInfo);
   const [lineItems, setLineItems] = useState<LineItem[]>(defaultLineItems);
   const [taxRate, setTaxRate] = useState(25);
-  const [quoteNumber] = useState(
-    "QT-" + String(Math.floor(Math.random() * 900) + 100).padStart(3, "0")
-  );
+  const [quoteNumber] = useState(() => generateQuoteNumber());
+  const [savedQuoteId, setSavedQuoteId] = useState<string | null>(null);
+
+  // Templates
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [sendMethod, setSendMethod] = useState<"email" | "sms" | "link">(
     "email"
   );
@@ -86,6 +93,7 @@ export default function NewQuotePage() {
 
   useEffect(() => {
     setSavedClients(loadClients());
+    setTemplates(loadTemplates());
   }, []);
 
   const filteredClients = savedClients.filter((c) => {
@@ -162,57 +170,63 @@ export default function NewQuotePage() {
     return true;
   };
 
+  const buildQuotePayload = (status: "draft" | "sent") => ({
+    quoteNumber,
+    status,
+    clientName: clientInfo.name,
+    clientEmail: clientInfo.email,
+    clientPhone: clientInfo.phone,
+    clientCompany: clientInfo.company,
+    clientAddress: clientInfo.address,
+    clientCity: clientInfo.city,
+    clientNotes: clientInfo.notes,
+    lineItems: lineItems.map(({ id, description, qty, unitPrice }) => ({ id, description, qty, unitPrice })),
+    taxRate,
+    subtotal,
+    tax,
+    total,
+    rotEnabled,
+    rotType,
+    laborAmount,
+    personnummer,
+    rotDeduction,
+    customerPays,
+    validDays: 30,
+    message: "",
+    sendMethod,
+    sentAt: status === "sent" ? new Date().toISOString() : undefined,
+  });
+
   const handleSend = async () => {
     setSendError(null);
     setIsSending(true);
-
     try {
-      const res = await fetch("/api/quotes/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          quote: {
-            number: quoteNumber,
-            lineItems,
-            subtotal,
-            tax,
-            taxRate,
-            total,
-          },
-          recipient: {
-            name: clientInfo.name,
-            email: clientInfo.email,
-            phone: clientInfo.phone,
-            company: clientInfo.company,
-            address: clientInfo.address,
-            city: clientInfo.city,
-          },
-          sender: {
-            name: "Jane Doe",
-            email: "jane@example.com",
-          },
-          sendMethod,
-          options,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setSendError(data.error || "Något gick fel. Försök igen.");
-        return;
+      const payload = buildQuotePayload("sent");
+      if (savedQuoteId) {
+        updateQuote(savedQuoteId, payload);
+        setShareLink(`${window.location.origin}/q/${savedQuoteId}`);
+      } else {
+        const saved = addQuote(payload);
+        setSavedQuoteId(saved.id);
+        setShareLink(`${window.location.origin}/q/${saved.id}`);
       }
-
-      if (sendMethod === "link" && data.link) {
-        setShareLink(data.link);
-      }
-
       setSent(true);
     } catch {
-      setSendError("Nätverksfel – kontrollera din anslutning och försök igen.");
+      setSendError("Något gick fel. Försök igen.");
     } finally {
       setIsSending(false);
     }
+  };
+
+  const handleSaveDraft = () => {
+    const payload = buildQuotePayload("draft");
+    if (savedQuoteId) {
+      updateQuote(savedQuoteId, payload);
+    } else {
+      const saved = addQuote(payload);
+      setSavedQuoteId(saved.id);
+    }
+    router.push("/quotes");
   };
 
   const toggleOption = (key: keyof typeof options) => {
@@ -477,12 +491,44 @@ export default function NewQuotePage() {
         {/* ── Steg 2: Radartiklar ── */}
         {currentStep === 2 && (
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">
-              Radartiklar
-            </h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-lg font-semibold text-gray-900">Radartiklar</h2>
+              <button
+                onClick={() => setShowTemplates((v) => !v)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-600 border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h8" />
+                </svg>
+                Välj mall
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
               Lägg till produkter eller tjänster i offerten.
             </p>
+
+            {/* Template picker */}
+            {showTemplates && templates.length > 0 && (
+              <div className="mb-5 border border-indigo-100 bg-indigo-50/60 rounded-xl p-4">
+                <p className="text-xs font-semibold text-indigo-700 mb-3 uppercase tracking-wide">Välj en mall att ladda</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {templates.filter((t) => t.type === "quote" || t.type === "both").map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setLineItems(t.lineItems.map((li) => ({ ...li, id: generateId() })));
+                        setShowTemplates(false);
+                      }}
+                      className="text-left p-3 bg-white border border-indigo-100 rounded-lg hover:border-indigo-400 hover:shadow-sm transition-all"
+                    >
+                      <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+                      {t.description && <p className="text-xs text-gray-500 mt-0.5">{t.description}</p>}
+                      <p className="text-xs text-indigo-600 mt-1">{t.lineItems.length} rader</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0 mb-4">
               <div className="min-w-[480px] border border-gray-200 rounded-xl overflow-hidden">
@@ -1321,13 +1367,22 @@ export default function NewQuotePage() {
         {/* Navigeringsknappar */}
         {!sent && (
           <div className="flex items-center justify-between mt-6">
-            <button
-              onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}
-              disabled={currentStep === 1}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              Tillbaka
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}
+                disabled={currentStep === 1}
+                className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Tillbaka
+              </button>
+              <button
+                onClick={handleSaveDraft}
+                className="px-4 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-xl border border-gray-200 transition-colors"
+                title="Spara som utkast och gå till offerter"
+              >
+                Spara utkast
+              </button>
+            </div>
 
             {currentStep < 4 && (
               <button

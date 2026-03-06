@@ -1,45 +1,35 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Badge } from "@/components/ui/Badge";
+import { type Quote, type QuoteStatus, loadQuotes, deleteQuote, updateQuote } from "@/lib/quotes";
 
-type QuoteStatus = "draft" | "sent" | "opened" | "accepted" | "declined";
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
-interface Quote {
-  id: string;
-  client: string;
-  clientInitial: string;
-  company: string;
-  amount: string;
-  amountRaw: number;
-  status: QuoteStatus;
-  date: string;
-  expiry: string;
-  email: string;
-}
+const SEK = (n: number) =>
+  new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK", maximumFractionDigits: 0 }).format(n);
 
-const allQuotes: Quote[] = [
-  { id: "QT-001", client: "Sarah Chen", clientInitial: "S", company: "Acme Corp", amount: "4 200 kr", amountRaw: 4200, status: "accepted", date: "1 mar 2026", expiry: "31 mar 2026", email: "sarah@acmecorp.com" },
-  { id: "QT-002", client: "Tom Watts", clientInitial: "T", company: "Pixel Studio", amount: "2 800 kr", amountRaw: 2800, status: "opened", date: "2 mar 2026", expiry: "1 apr 2026", email: "tom@pixelstudio.io" },
-  { id: "QT-003", client: "Anna Lee", clientInitial: "A", company: "Summit IT", amount: "8 500 kr", amountRaw: 8500, status: "sent", date: "2 mar 2026", expiry: "2 apr 2026", email: "anna@summittech.com" },
-  { id: "QT-004", client: "Mike Rossi", clientInitial: "M", company: "Nova Consulting", amount: "1 950 kr", amountRaw: 1950, status: "draft", date: "3 mar 2026", expiry: "3 apr 2026", email: "mike@novaconsult.co" },
-  { id: "QT-005", client: "James Hill", clientInitial: "J", company: "Blue Ridge Construction", amount: "12 400 kr", amountRaw: 12400, status: "accepted", date: "28 feb 2026", expiry: "28 mar 2026", email: "james@blueridge.build" },
-  { id: "QT-006", client: "Laura Kim", clientInitial: "L", company: "Evergreen Events", amount: "3 100 kr", amountRaw: 3100, status: "declined", date: "27 feb 2026", expiry: "27 mar 2026", email: "laura@evergreen.co" },
-  { id: "QT-007", client: "David Park", clientInitial: "D", company: "Horizon Media", amount: "6 750 kr", amountRaw: 6750, status: "sent", date: "26 feb 2026", expiry: "26 mar 2026", email: "david@horizonmedia.com" },
-  { id: "QT-008", client: "Emma Torres", clientInitial: "E", company: "Bright Digital", amount: "2 200 kr", amountRaw: 2200, status: "accepted", date: "25 feb 2026", expiry: "25 mar 2026", email: "emma@brightdigital.io" },
-  { id: "QT-009", client: "Ryan Foster", clientInitial: "R", company: "PineCone Agency", amount: "4 900 kr", amountRaw: 4900, status: "opened", date: "24 feb 2026", expiry: "24 mar 2026", email: "ryan@pinecone.agency" },
-  { id: "QT-010", client: "Jessica Lane", clientInitial: "J", company: "Alpine Builders", amount: "15 000 kr", amountRaw: 15000, status: "draft", date: "23 feb 2026", expiry: "23 mar 2026", email: "jess@alpinebuilders.com" },
-  { id: "QT-011", client: "Carlos Vega", clientInitial: "C", company: "Vega Solutions", amount: "3 600 kr", amountRaw: 3600, status: "accepted", date: "22 feb 2026", expiry: "22 mar 2026", email: "carlos@vegasolutions.mx" },
-  { id: "QT-012", client: "Nina Patel", clientInitial: "N", company: "Spark Creative", amount: "1 200 kr", amountRaw: 1200, status: "declined", date: "20 feb 2026", expiry: "20 mar 2026", email: "nina@sparkcreative.in" },
-];
-
-const clientColors: Record<string, string> = {
-  S: "bg-blue-500", T: "bg-purple-500", A: "bg-indigo-500", M: "bg-teal-500",
-  J: "bg-orange-500", L: "bg-emerald-500", D: "bg-rose-500", E: "bg-cyan-500",
-  R: "bg-amber-500", C: "bg-lime-600", N: "bg-pink-500", B: "bg-violet-500",
+const fmtDate = (iso?: string) => {
+  if (!iso) return "–";
+  return new Date(iso).toLocaleDateString("sv-SE", { day: "numeric", month: "short", year: "numeric" });
 };
+
+const expiryDate = (createdAt: string, validDays: number) => {
+  const d = new Date(createdAt);
+  d.setDate(d.getDate() + validDays);
+  return fmtDate(d.toISOString());
+};
+
+const AVATAR_COLORS = [
+  "bg-indigo-500", "bg-purple-500", "bg-blue-500", "bg-emerald-500",
+  "bg-rose-500", "bg-amber-500", "bg-teal-500", "bg-cyan-500",
+];
+const avatarColor = (str: string) => AVATAR_COLORS[str.charCodeAt(0) % AVATAR_COLORS.length];
 
 const tabs = [
   { label: "Alla", value: "all" },
@@ -60,18 +50,33 @@ const statusLabel: Record<QuoteStatus, string> = {
 
 const ITEMS_PER_PAGE = 8;
 
+// ---------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------
+
 export default function QuotesPage() {
+  const router = useRouter();
+  const [quotes, setQuotes] = useState<Quote[]>([]);
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [statusMenuId, setStatusMenuId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const filtered = allQuotes.filter((q) => {
+  const reload = useCallback(() => setQuotes(loadQuotes()), []);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  const filtered = quotes.filter((q) => {
     const matchesTab = activeTab === "all" || q.status === activeTab;
     const matchesSearch =
       search === "" ||
-      q.client.toLowerCase().includes(search.toLowerCase()) ||
-      q.company.toLowerCase().includes(search.toLowerCase()) ||
-      q.id.toLowerCase().includes(search.toLowerCase());
+      q.clientName.toLowerCase().includes(search.toLowerCase()) ||
+      q.clientCompany.toLowerCase().includes(search.toLowerCase()) ||
+      q.quoteNumber.toLowerCase().includes(search.toLowerCase());
     return matchesTab && matchesSearch;
   });
 
@@ -88,19 +93,59 @@ export default function QuotesPage() {
     setCurrentPage(1);
   };
 
+  const handleDelete = (id: string) => {
+    deleteQuote(id);
+    reload();
+    setConfirmDeleteId(null);
+  };
+
+  const handleStatusChange = (id: string, status: QuoteStatus) => {
+    const now = new Date().toISOString();
+    const extra: Partial<Quote> = { status };
+    if (status === "sent") extra.sentAt = now;
+    if (status === "opened") extra.openedAt = now;
+    if (status === "accepted") extra.acceptedAt = now;
+    if (status === "declinced") extra.declinedAt = now;
+    updateQuote(id, extra);
+    reload();
+    setStatusMenuId(null);
+  };
+
+  const handleCopyLink = (id: string) => {
+    navigator.clipboard.writeText(`${window.location.origin}/q/${id}`);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleConvertToInvoice = (q: Quote) => {
+    // Store quote data in sessionStorage so invoice wizard can pre-fill
+    sessionStorage.setItem("prefill_invoice", JSON.stringify({
+      clientName: q.clientName,
+      clientEmail: q.clientEmail,
+      clientPhone: q.clientPhone,
+      clientCompany: q.clientCompany,
+      clientAddress: q.clientAddress,
+      clientCity: q.clientCity,
+      lineItems: q.lineItems,
+      taxRate: q.taxRate,
+      sourceQuoteId: q.id,
+    }));
+    router.push("/invoices/new");
+  };
+
   const tabCounts = tabs.map((tab) => ({
     ...tab,
-    count: tab.value === "all" ? allQuotes.length : allQuotes.filter((q) => q.status === tab.value).length,
+    count: tab.value === "all" ? quotes.length : quotes.filter((q) => q.status === tab.value).length,
   }));
 
   return (
     <AppLayout>
       <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-        {/* Sidhuvud */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Offerter</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{allQuotes.length} offerter totalt</p>
+            <p className="text-sm text-gray-500 mt-0.5">{quotes.length} offerter totalt</p>
           </div>
           <Link
             href="/quotes/new"
@@ -115,7 +160,6 @@ export default function QuotesPage() {
 
         {/* Filter */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
-          {/* Flikar */}
           <div className="flex items-center gap-1 px-4 pt-4 border-b border-gray-100 overflow-x-auto">
             {tabCounts.map((tab) => (
               <button
@@ -136,8 +180,6 @@ export default function QuotesPage() {
               </button>
             ))}
           </div>
-
-          {/* Sök + sortera */}
           <div className="px-4 py-3 flex flex-wrap items-center gap-2">
             <div className="relative flex-1 min-w-0" style={{ minWidth: "180px" }}>
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -145,25 +187,11 @@ export default function QuotesPage() {
               </svg>
               <input
                 type="text"
-                placeholder="Sök klient, företag eller ID..."
+                placeholder="Sök klient, företag eller nummer..."
                 value={search}
                 onChange={handleSearch}
-                className="form-input pl-9"
+                className="form-input pl-9 w-full"
               />
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <button className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-                <span className="hidden sm:inline">Filter</span>
-              </button>
-              <button className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                <span className="hidden sm:inline">Exportera</span>
-              </button>
             </div>
           </div>
         </div>
@@ -178,8 +206,8 @@ export default function QuotesPage() {
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Kund</th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Belopp</th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Status</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Skickad</th>
-                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Utgångsdatum</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Skapad</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-3.5">Giltig t.o.m.</th>
                   <th className="text-right text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3.5">Åtgärder</th>
                 </tr>
               </thead>
@@ -194,60 +222,114 @@ export default function QuotesPage() {
                           </svg>
                         </div>
                         <p className="text-sm font-medium text-gray-500">Inga offerter hittades</p>
-                        <p className="text-xs text-gray-400">Prova att justera din sökning eller ditt filter</p>
+                        <Link href="/quotes/new" className="text-sm text-indigo-600 hover:underline">
+                          Skapa din första offert →
+                        </Link>
                       </div>
                     </td>
                   </tr>
                 ) : (
-                  paginated.map((quote) => (
-                    <tr key={quote.id} className="table-row-hover group">
+                  paginated.map((q) => (
+                    <tr key={q.id} className="table-row-hover group relative">
                       <td className="px-6 py-4">
-                        <span className="text-sm font-mono font-semibold text-indigo-600">{quote.id}</span>
+                        <span className="text-sm font-mono font-semibold text-indigo-600">{q.quoteNumber}</span>
                       </td>
                       <td className="px-3 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full ${clientColors[quote.clientInitial] || "bg-gray-400"} text-white text-sm font-semibold flex items-center justify-center shrink-0`}>
-                            {quote.clientInitial}
+                          <div className={`w-8 h-8 rounded-full ${avatarColor(q.clientName)} text-white text-sm font-semibold flex items-center justify-center shrink-0`}>
+                            {q.clientName.charAt(0)}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-900">{quote.client}</p>
-                            <p className="text-xs text-gray-500">{quote.company}</p>
+                            <p className="text-sm font-medium text-gray-900">{q.clientName}</p>
+                            <p className="text-xs text-gray-500">{q.clientCompany || q.clientEmail}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-3 py-4">
-                        <span className="text-sm font-bold text-gray-900">{quote.amount}</span>
+                        <span className="text-sm font-bold text-gray-900">{SEK(q.total)}</span>
                       </td>
                       <td className="px-3 py-4">
-                        <Badge variant={quote.status} dot>
-                          {statusLabel[quote.status]}
-                        </Badge>
+                        <div className="relative">
+                          <button
+                            onClick={() => setStatusMenuId(statusMenuId === q.id ? null : q.id)}
+                            className="group/badge"
+                            title="Klicka för att ändra status"
+                          >
+                            <Badge variant={q.status} dot>{statusLabel[q.status]}</Badge>
+                          </button>
+                          {statusMenuId === q.id && (
+                            <>
+                              <div className="fixed inset-0 z-10" onClick={() => setStatusMenuId(null)} />
+                              <div className="absolute z-20 top-8 left-0 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-44">
+                                {(["draft","sent","opened","accepted","declined"] as QuoteStatus[]).map((s) => (
+                                  <button
+                                    key={s}
+                                    onClick={() => handleStatusChange(q.id, s)}
+                                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${q.status === s ? "font-semibold text-indigo-600" : "text-gray-700"}`}
+                                  >
+                                    {statusLabel[s]}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </td>
                       <td className="px-3 py-4">
-                        <span className="text-sm text-gray-500">{quote.date}</span>
+                        <span className="text-sm text-gray-500">{fmtDate(q.createdAt)}</span>
                       </td>
                       <td className="px-3 py-4">
-                        <span className="text-sm text-gray-500">{quote.expiry}</span>
+                        <span className="text-sm text-gray-500">{expiryDate(q.createdAt, q.validDays || 30)}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-1">
-                          <button className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Förhandsgranska">
+                          {/* Visa/dela */}
+                          <a
+                            href={`/q/${q.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                            title="Visa offert"
+                          >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
+                          </a>
+                          {/* Kopiera länk */}
+                          <button
+                            onClick={() => handleCopyLink(q.id)}
+                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                            title={copiedId === q.id ? "Kopierad!" : "Kopiera länk"}
+                          >
+                            {copiedId === q.id ? (
+                              <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            ) : (
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                            )}
                           </button>
-                          <button className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Redigera">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Skicka">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                            </svg>
-                          </button>
-                          <button className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Ta bort">
+                          {/* Konvertera till faktura (om accepterad) */}
+                          {q.status === "accepted" && !q.invoiceId && (
+                            <button
+                              onClick={() => handleConvertToInvoice(q)}
+                              className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                              title="Skapa faktura från offert"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                            </button>
+                          )}
+                          {/* Ta bort */}
+                          <button
+                            onClick={() => setConfirmDeleteId(q.id)}
+                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                            title="Ta bort"
+                          >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
@@ -261,49 +343,48 @@ export default function QuotesPage() {
             </table>
           </div>
 
-          {/* Sidnumrering */}
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
               <p className="text-sm text-gray-500">
                 Visar {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} av {filtered.length} offerter
               </p>
               <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
+                <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-40 transition-colors">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 </button>
                 {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                      currentPage === i + 1
-                        ? "bg-indigo-600 text-white"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
+                  <button key={i} onClick={() => setCurrentPage(i + 1)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === i + 1 ? "bg-indigo-600 text-white" : "text-gray-600 hover:bg-gray-100"}`}>{i + 1}</button>
                 ))}
-                <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-40 transition-colors">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </button>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Radera-dialog */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
+            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h3 className="text-base font-bold text-gray-900 text-center mb-1">Ta bort offert?</h3>
+            <p className="text-sm text-gray-500 text-center mb-6">
+              {quotes.find((q) => q.id === confirmDeleteId)?.quoteNumber} kommer att tas bort permanent.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmDeleteId(null)} className="flex-1 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors">Avbryt</button>
+              <button onClick={() => handleDelete(confirmDeleteId)} className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl transition-colors">Ta bort</button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }

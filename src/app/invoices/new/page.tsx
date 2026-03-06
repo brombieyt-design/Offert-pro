@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { type Client, loadClients } from "@/lib/clients";
+import { addInvoice, generateInvoiceNumber as genInvNumber, updateInvoice } from "@/lib/invoices";
+import { loadTemplates, type Template } from "@/lib/templates";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -31,12 +34,6 @@ interface ClientInfo {
 
 function formatSEK(n: number) {
   return new Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK", maximumFractionDigits: 0 }).format(n);
-}
-
-function generateInvoiceNumber() {
-  const y = new Date().getFullYear();
-  const n = Math.floor(Math.random() * 900) + 100;
-  return `FAK-${y}-${n}`;
 }
 
 function addDays(days: number) {
@@ -105,9 +102,14 @@ function StepBar({ current }: { current: number }) {
 // ---------------------------------------------------------------------------
 
 export default function NewInvoicePage() {
+  const router = useRouter();
   const [step, setStep] = useState(0);
-  const [invoiceNumber] = useState(generateInvoiceNumber);
+  const [invoiceNumber] = useState(() => genInvNumber());
   const [issueDate] = useState(new Date().toISOString().split("T")[0]);
+  const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(null);
+  // Templates
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [paymentTermDays, setPaymentTermDays] = useState(30);
   const [taxRate, setTaxRate] = useState(25);
   const [sendMethod, setSendMethod] = useState<"email" | "sms" | "link">("email");
@@ -127,6 +129,7 @@ export default function NewInvoicePage() {
 
   useEffect(() => {
     setSavedClients(loadClients());
+    setTemplates(loadTemplates());
   }, []);
 
   const filteredClients = savedClients.filter((c) => {
@@ -180,33 +183,62 @@ export default function NewInvoicePage() {
   const addItem = () => setItems((prev) => [...prev, { description: "", qty: 1, unitPrice: 0 }]);
   const removeItem = (idx: number) => setItems((prev) => prev.filter((_, i) => i !== idx));
 
+  const buildInvoicePayload = (status: "draft" | "sent") => ({
+    invoiceNumber,
+    status,
+    clientName: client.name,
+    clientEmail: client.email,
+    clientPhone: client.phone,
+    clientCompany: client.company,
+    clientOrgNumber: client.orgNumber,
+    clientAddress: client.address,
+    clientCity: client.city,
+    clientReference: client.reference,
+    lineItems: items,
+    taxRate,
+    subtotal,
+    tax,
+    total,
+    rotEnabled,
+    rotType,
+    laborAmount,
+    personnummer,
+    rotDeduction,
+    customerPays,
+    paymentTermDays,
+    issuedAt: issueDate,
+    dueAt: dueDate,
+    sentAt: status === "sent" ? new Date().toISOString() : undefined,
+  });
+
   const handleSend = async () => {
     setSendError(null);
     setIsSending(true);
     try {
-      const res = await fetch("/api/quotes/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          quote: { number: invoiceNumber, lineItems: items, subtotal, tax, taxRate, total },
-          recipient: {
-            name: client.name, email: client.email, phone: client.phone,
-            company: client.company, address: client.address, city: client.city,
-          },
-          sender: { name: "Jane Doe", email: "jane@example.com" },
-          sendMethod,
-          options: { enableSignature: false, autoReminder: true, notifyOnOpen: true },
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setSendError(data.error ?? "Något gick fel."); return; }
-      if (sendMethod === "link" && data.link) setShareLink(data.link);
+      const payload = buildInvoicePayload("sent");
+      if (savedInvoiceId) {
+        updateInvoice(savedInvoiceId, payload);
+      } else {
+        const saved = addInvoice(payload);
+        setSavedInvoiceId(saved.id);
+        if (sendMethod === "link") setShareLink(`${window.location.origin}/invoices`);
+      }
       setSent(true);
     } catch {
-      setSendError("Nätverksfel – kontrollera din anslutning och försök igen.");
+      setSendError("Något gick fel. Försök igen.");
     } finally {
       setIsSending(false);
     }
+  };
+
+  const handleSaveDraft = () => {
+    const payload = buildInvoicePayload("draft");
+    if (savedInvoiceId) {
+      updateInvoice(savedInvoiceId, payload);
+    } else {
+      addInvoice(payload);
+    }
+    router.push("/invoices");
   };
 
   // ------- steps -------
@@ -348,7 +380,39 @@ export default function NewInvoicePage() {
         {/* ------------------------------------------------------------------ */}
         {step === 1 && (
           <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 sm:p-6">
-            <h2 className="text-base font-semibold text-gray-900 mb-5">Fakturarader</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold text-gray-900">Fakturarader</h2>
+              <button
+                onClick={() => setShowTemplates((v) => !v)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-600 border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h8" />
+                </svg>
+                Välj mall
+              </button>
+            </div>
+            {showTemplates && templates.filter((t) => t.type === "invoice" || t.type === "both").length > 0 && (
+              <div className="mb-5 border border-indigo-100 bg-indigo-50/60 rounded-xl p-4">
+                <p className="text-xs font-semibold text-indigo-700 mb-3 uppercase tracking-wide">Välj en mall att ladda</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {templates.filter((t) => t.type === "invoice" || t.type === "both").map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setItems(t.lineItems.map((li) => ({ ...li })));
+                        setShowTemplates(false);
+                      }}
+                      className="text-left p-3 bg-white border border-indigo-100 rounded-lg hover:border-indigo-400 hover:shadow-sm transition-all"
+                    >
+                      <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+                      {t.description && <p className="text-xs text-gray-500 mt-0.5">{t.description}</p>}
+                      <p className="text-xs text-indigo-600 mt-1">{t.lineItems.length} rader</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Momssats */}
             <div className="flex items-center gap-3 mb-5 p-3 bg-indigo-50 rounded-xl">
@@ -570,9 +634,14 @@ export default function NewInvoicePage() {
             </div>
 
             <div className="mt-6 flex justify-between">
-              <button onClick={() => setStep(0)} className="px-5 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors">
-                ← Tillbaka
-              </button>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setStep(0)} className="px-5 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors">
+                  ← Tillbaka
+                </button>
+                <button onClick={handleSaveDraft} className="px-4 py-2.5 border border-gray-200 text-gray-500 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors">
+                  Spara utkast
+                </button>
+              </div>
               <button
                 onClick={() => setStep(2)}
                 disabled={!step2Valid}
