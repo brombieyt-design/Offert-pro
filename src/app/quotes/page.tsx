@@ -105,7 +105,7 @@ export default function QuotesPage() {
     if (status === "sent") extra.sentAt = now;
     if (status === "opened") extra.openedAt = now;
     if (status === "accepted") extra.acceptedAt = now;
-    if (status === "declinced") extra.declinedAt = now;
+    if (status === "declined") extra.declinedAt = now;
     updateQuote(id, extra);
     reload();
     setStatusMenuId(null);
