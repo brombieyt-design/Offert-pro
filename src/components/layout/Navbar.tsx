@@ -25,23 +25,23 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logotyp */}
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
               <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <span className="text-xl font-bold text-gray-900 tracking-tight">Offert-pro</span>
+            <span className={`text-xl font-bold tracking-tight transition-colors ${scrolled ? "text-gray-900" : "text-white"}`}>Offert-pro</span>
           </Link>
 
           {/* Desktopmeny */}
           <nav className="hidden md:flex items-center gap-1">
-            <Link href="/#features" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
+            <Link href="/#how-it-works" className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${scrolled ? "text-gray-600 hover:text-gray-900 hover:bg-gray-100" : "text-gray-300 hover:text-white hover:bg-white/10"}`}>
               Funktioner
             </Link>
-            <Link href="/pricing" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
+            <Link href="/pricing" className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${scrolled ? "text-gray-600 hover:text-gray-900 hover:bg-gray-100" : "text-gray-300 hover:text-white hover:bg-white/10"}`}>
               Priser
             </Link>
-            <Link href="/#about" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
+            <Link href="/#about" className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${scrolled ? "text-gray-600 hover:text-gray-900 hover:bg-gray-100" : "text-gray-300 hover:text-white hover:bg-white/10"}`}>
               Om oss
             </Link>
           </nav>
@@ -50,13 +50,13 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
+              className={`px-4 py-2 text-sm font-semibold transition-colors ${scrolled ? "text-gray-700 hover:text-gray-900" : "text-gray-300 hover:text-white"}`}
             >
               Logga in
             </Link>
             <Link
               href="/dashboard"
-              className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-sm shadow-indigo-200"
+              className={`px-5 py-2.5 text-sm font-semibold rounded-xl transition-colors ${scrolled ? "text-white bg-gray-900 hover:bg-gray-700" : "text-gray-900 bg-white hover:bg-gray-100"}`}
             >
               Kom igång gratis
             </Link>
@@ -64,7 +64,7 @@ export function Navbar() {
 
           {/* Mobilmenyknapp */}
           <button
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            className={`md:hidden p-2 rounded-lg transition-colors ${scrolled ? "text-gray-600 hover:bg-gray-100" : "text-gray-300 hover:bg-white/10"}`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
