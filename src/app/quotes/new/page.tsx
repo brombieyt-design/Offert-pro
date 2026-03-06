@@ -6,6 +6,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { type Client, loadClients } from "@/lib/clients";
 import { addQuote, generateQuoteNumber, updateQuote } from "@/lib/quotes";
 import { loadTemplates, type Template } from "@/lib/templates";
+import { loadSettings, type CompanySettings } from "@/lib/settings";
 
 interface LineItem {
   id: string;
@@ -86,6 +87,8 @@ export default function NewQuotePage() {
   const [laborAmount, setLaborAmount] = useState(0);
   const [personnummer, setPersonnummer] = useState("");
 
+  const [settings, setSettings] = useState<CompanySettings | null>(null);
+
   // Client picker
   const [savedClients, setSavedClients] = useState<Client[]>([]);
   const [clientSearch, setClientSearch] = useState("");
@@ -94,6 +97,7 @@ export default function NewQuotePage() {
   useEffect(() => {
     setSavedClients(loadClients());
     setTemplates(loadTemplates());
+    setSettings(loadSettings());
   }, []);
 
   const filteredClients = savedClients.filter((c) => {
@@ -202,14 +206,44 @@ export default function NewQuotePage() {
     setIsSending(true);
     try {
       const payload = buildQuotePayload("sent");
+      let quoteId = savedQuoteId;
       if (savedQuoteId) {
         updateQuote(savedQuoteId, payload);
-        setShareLink(`${window.location.origin}/q/${savedQuoteId}`);
       } else {
         const saved = addQuote(payload);
+        quoteId = saved.id;
         setSavedQuoteId(saved.id);
-        setShareLink(`${window.location.origin}/q/${saved.id}`);
       }
+
+      // Build URL-encoded share link so the client can view the quote
+      // on any device/browser without needing a backend.
+      const s = settings ?? loadSettings();
+      const shareData = {
+        quote: { ...payload, id: quoteId, createdAt: new Date().toISOString() },
+        company: {
+          name: s.companyName || "Ditt Företag",
+          email: s.email,
+          phone: s.phone,
+        },
+      };
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
+      const link = `${window.location.origin}/q/${quoteId}?d=${encodeURIComponent(encoded)}`;
+      setShareLink(link);
+
+      // Open mailto: if email method selected
+      if (sendMethod === "email" && clientInfo.email) {
+        const subject = encodeURIComponent(`Offert ${quoteNumber} från ${s.companyName || "oss"}`);
+        const body = encodeURIComponent(
+          `Hej ${clientInfo.name},\n\nDu har fått en offert från ${s.companyName || "oss"}.\n\nKlicka på länken nedan för att granska och acceptera offerten:\n\n${link}\n\nMed vänliga hälsningar,\n${s.companyName || ""}`
+        );
+        window.open(`mailto:${clientInfo.email}?subject=${subject}&body=${body}`);
+      }
+
+      // Auto-copy for link method
+      if (sendMethod === "link") {
+        navigator.clipboard.writeText(link).catch(() => {});
+      }
+
       setSent(true);
     } catch {
       setSendError("Något gick fel. Försök igen.");
@@ -817,9 +851,10 @@ export default function NewQuotePage() {
                       Offert-pro
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500">Jane Doe</p>
-                  <p className="text-sm text-gray-500">jane@example.com</p>
-                  <p className="text-sm text-gray-500">Stockholm</p>
+                  <p className="text-sm text-gray-500">{settings?.companyName || "Ditt Företag"}</p>
+                  {settings?.email && <p className="text-sm text-gray-500">{settings.email}</p>}
+                  {settings?.phone && <p className="text-sm text-gray-500">{settings.phone}</p>}
+                  {settings?.address && <p className="text-sm text-gray-500">{settings.address}</p>}
                 </div>
                 <div className="text-left sm:text-right">
                   <div className="text-2xl font-extrabold text-gray-900 mb-1">

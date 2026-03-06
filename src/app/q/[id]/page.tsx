@@ -22,6 +22,28 @@ export default function PublicQuotePage({ params }: { params: { id: string } }) 
   const [confirming, setConfirming] = useState<"accept" | "decline" | null>(null);
 
   useEffect(() => {
+    // Try URL-encoded data first — this is how cross-browser sharing works
+    // without a backend. The sender encodes the full quote + company info
+    // into the URL so the client can view it on any device.
+    const urlParams = new URLSearchParams(window.location.search);
+    const encoded = urlParams.get("d");
+    if (encoded) {
+      try {
+        const json = decodeURIComponent(escape(atob(encoded)));
+        const data = JSON.parse(json);
+        if (data.quote) {
+          setQuote(data.quote);
+          setCompanyName(data.company?.name || "Ditt Företag");
+          setCompanyEmail(data.company?.email || "");
+          setCompanyPhone(data.company?.phone || "");
+          setLogo(""); // logo excluded from URL to keep link short
+          return;
+        }
+      } catch {
+        // fallthrough to localStorage
+      }
+    }
+    // Fallback: localStorage (only works if viewer is on the same browser as creator)
     const q = getQuote(params.id);
     setQuote(q ?? null);
     const s = loadSettings();
