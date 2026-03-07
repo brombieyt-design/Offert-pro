@@ -1,34 +1,54 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { loadQuotes, type Quote } from "@/lib/quotes";
 
 // ---------------------------------------------------------------------------
-// Data
+// Data helpers — derive real analytics from localStorage quotes
 // ---------------------------------------------------------------------------
 
-const monthlyData = [
-  { month: "Apr", revenue: 28000, quotes: 7, accepted: 4 },
-  { month: "Maj", revenue: 35000, quotes: 9, accepted: 6 },
-  { month: "Jun", revenue: 31000, quotes: 8, accepted: 5 },
-  { month: "Jul", revenue: 22000, quotes: 5, accepted: 3 },
-  { month: "Aug", revenue: 45000, quotes: 11, accepted: 8 },
-  { month: "Sep", revenue: 38000, quotes: 10, accepted: 7 },
-  { month: "Okt", revenue: 52000, quotes: 13, accepted: 10 },
-  { month: "Nov", revenue: 48000, quotes: 12, accepted: 9 },
-  { month: "Dec", revenue: 41000, quotes: 10, accepted: 7 },
-  { month: "Jan", revenue: 55000, quotes: 14, accepted: 11 },
-  { month: "Feb", revenue: 67000, quotes: 16, accepted: 13 },
-  { month: "Mar", revenue: 58000, quotes: 15, accepted: 12 },
-];
+const SWEDISH_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
 
-const topClients = [
-  { name: "Byggmax AB", company: "Byggmax AB", total: 124500, quotes: 8, rate: 88 },
-  { name: "Teknik Solutions", company: "Teknik Solutions", total: 98200, quotes: 6, rate: 83 },
-  { name: "Nordic Retail", company: "Nordic Retail", total: 87600, quotes: 7, rate: 71 },
-  { name: "Fastighets AB Sthlm", company: "Fastighets AB Sthlm", total: 76300, quotes: 5, rate: 80 },
-  { name: "Media & Co", company: "Media & Co", total: 54100, quotes: 4, rate: 75 },
-];
+function buildMonthlyData(quotes: Quote[], monthsBack: number) {
+  const now = new Date();
+  return Array.from({ length: monthsBack }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (monthsBack - 1 - i), 1);
+    const year = d.getFullYear();
+    const month = d.getMonth();
+    const label = SWEDISH_MONTHS[month];
+    const inMonth = quotes.filter((q) => {
+      const qd = new Date(q.createdAt);
+      return qd.getFullYear() === year && qd.getMonth() === month && q.status !== "draft";
+    });
+    const accepted = inMonth.filter((q) => q.status === "accepted");
+    return {
+      month: label,
+      revenue: accepted.reduce((s, q) => s + q.customerPays, 0),
+      quotes: inMonth.length,
+      accepted: accepted.length,
+    };
+  });
+}
+
+function buildTopClients(quotes: Quote[]) {
+  const map: Record<string, { name: string; total: number; quotes: number; accepted: number }> = {};
+  quotes.forEach((q) => {
+    const key = q.clientCompany || q.clientName || "Okänd kund";
+    if (!map[key]) map[key] = { name: key, total: 0, quotes: 0, accepted: 0 };
+    if (q.status !== "draft") {
+      map[key].quotes++;
+      if (q.status === "accepted") {
+        map[key].total += q.customerPays;
+        map[key].accepted++;
+      }
+    }
+  });
+  return Object.values(map)
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 5)
+    .map((c) => ({ ...c, company: c.name, rate: c.quotes > 0 ? Math.round((c.accepted / c.quotes) * 100) : 0 }));
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -169,6 +189,11 @@ function BarChart({ data }: { data: { month: string; quotes: number; accepted: n
 
 function DonutChart({ slices }: { slices: { label: string; value: number; color: string }[] }) {
   const total = slices.reduce((s, sl) => s + sl.value, 0);
+  if (total === 0) return (
+    <div className="w-36 h-36 shrink-0 flex items-center justify-center">
+      <span className="text-xs text-gray-400">Ingen data</span>
+    </div>
+  );
   const R = 52;
   const stroke = 18;
   const cx = 70;
@@ -214,32 +239,47 @@ function DonutChart({ slices }: { slices: { label: string; value: number; color:
 
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState("12m");
+  const [allQuotes, setAllQuotes] = useState<Quote[]>([]);
 
-  const periodData = {
-    "3m": monthlyData.slice(-3),
-    "6m": monthlyData.slice(-6),
-    "12m": monthlyData,
-  }[period] ?? monthlyData;
+  useEffect(() => {
+    setAllQuotes(loadQuotes());
+  }, []);
 
+  const monthsBack = period === "3m" ? 3 : period === "6m" ? 6 : 12;
+  const periodMonthlyData = buildMonthlyData(allQuotes, monthsBack);
+
+  // Quotes active in the selected period (by createdAt)
+  const now = new Date();
+  const cutoff = new Date(now.getFullYear(), now.getMonth() - monthsBack + 1, 1);
+  const periodQuotes = allQuotes.filter((q) => new Date(q.createdAt) >= cutoff && q.status !== "draft");
+
+  const periodData = periodMonthlyData;
   const totalRevenue = periodData.reduce((s, d) => s + d.revenue, 0);
   const totalQuotes = periodData.reduce((s, d) => s + d.quotes, 0);
   const totalAccepted = periodData.reduce((s, d) => s + d.accepted, 0);
-  const winRate = Math.round((totalAccepted / totalQuotes) * 100);
-  const avgQuote = Math.round(totalRevenue / totalAccepted);
+  const winRate = totalQuotes > 0 ? Math.round((totalAccepted / totalQuotes) * 100) : 0;
+  const avgQuote = totalAccepted > 0 ? Math.round(totalRevenue / totalAccepted) : 0;
 
+  const topClients = buildTopClients(allQuotes.filter((q) => new Date(q.createdAt) >= cutoff));
+
+  const statusCounts = {
+    accepted: periodQuotes.filter((q) => q.status === "accepted").length,
+    declined: periodQuotes.filter((q) => q.status === "declined").length,
+    opened: periodQuotes.filter((q) => q.status === "opened").length,
+    sent: periodQuotes.filter((q) => q.status === "sent").length,
+  };
   const donutSlices = [
-    { label: "Accepterade", value: totalAccepted, color: "#10B981" },
-    { label: "Avböjda", value: Math.round(totalQuotes * 0.15), color: "#EF4444" },
-    { label: "Öppnade", value: Math.round(totalQuotes * 0.12), color: "#F59E0B" },
-    { label: "Skickade", value: Math.round(totalQuotes * 0.08), color: "#3B82F6" },
-    { label: "Utkast", value: totalQuotes - totalAccepted - Math.round(totalQuotes * 0.35), color: "#E2E8F0" },
-  ];
+    { label: "Accepterade", value: statusCounts.accepted, color: "#10B981" },
+    { label: "Avböjda", value: statusCounts.declined, color: "#EF4444" },
+    { label: "Öppnade", value: statusCounts.opened, color: "#F59E0B" },
+    { label: "Skickade", value: statusCounts.sent, color: "#3B82F6" },
+  ].filter((s) => s.value > 0);
 
   const kpis = [
     {
       label: "Total intäkt",
       value: formatSEK(totalRevenue),
-      change: "+18%",
+      change: null,
       up: true,
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -251,7 +291,7 @@ export default function AnalyticsPage() {
     {
       label: "Genomsnittlig offert",
       value: formatSEK(avgQuote),
-      change: "+8%",
+      change: null,
       up: true,
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -263,7 +303,7 @@ export default function AnalyticsPage() {
     {
       label: "Vinstfrekvens",
       value: `${winRate}%`,
-      change: "+4%",
+      change: null,
       up: true,
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -275,7 +315,7 @@ export default function AnalyticsPage() {
     {
       label: "Skickade offerter",
       value: totalQuotes.toString(),
-      change: "+23%",
+      change: null,
       up: true,
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -319,9 +359,11 @@ export default function AnalyticsPage() {
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${kpi.bg}`}>
                   {kpi.icon}
                 </div>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${kpi.up ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}>
-                  {kpi.change}
-                </span>
+                {kpi.change && (
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${kpi.up ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}>
+                    {kpi.change}
+                  </span>
+                )}
               </div>
               <p className="text-xl sm:text-2xl font-bold text-gray-900 leading-none mb-1">{kpi.value}</p>
               <p className="text-xs text-gray-500">{kpi.label}</p>
@@ -400,6 +442,13 @@ export default function AnalyticsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
+                {topClients.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-5 sm:px-6 py-8 text-center text-sm text-gray-400">
+                      Inga kunder att visa för den valda perioden.
+                    </td>
+                  </tr>
+                )}
                 {topClients.map((client, i) => (
                   <tr key={i} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 sm:px-6 py-4">
@@ -434,12 +483,17 @@ export default function AnalyticsPage() {
           <h2 className="font-semibold text-gray-900 mb-1">Konverteringstratt</h2>
           <p className="text-xs text-gray-400 mb-6">Hur offerter rör sig genom processen</p>
           <div className="space-y-3">
-            {[
-              { label: "Skapade", value: totalQuotes, pct: 100, color: "bg-gray-200" },
-              { label: "Skickade", value: Math.round(totalQuotes * 0.9), pct: 90, color: "bg-blue-400" },
-              { label: "Öppnade", value: Math.round(totalQuotes * 0.72), pct: 72, color: "bg-amber-400" },
-              { label: "Accepterade", value: totalAccepted, pct: winRate, color: "bg-emerald-500" },
-            ].map((stage, i) => (
+            {(() => {
+              const sent = statusCounts.sent + statusCounts.opened + statusCounts.accepted + statusCounts.declined;
+              const opened = statusCounts.opened + statusCounts.accepted + statusCounts.declined;
+              const stages = [
+                { label: "Skapade", value: totalQuotes, pct: 100, color: "bg-gray-200" },
+                { label: "Skickade", value: sent, pct: totalQuotes > 0 ? Math.round((sent / totalQuotes) * 100) : 0, color: "bg-blue-400" },
+                { label: "Öppnade", value: opened, pct: totalQuotes > 0 ? Math.round((opened / totalQuotes) * 100) : 0, color: "bg-amber-400" },
+                { label: "Accepterade", value: totalAccepted, pct: winRate, color: "bg-emerald-500" },
+              ];
+              return stages;
+            })().map((stage, i) => (
               <div key={i} className="flex items-center gap-4">
                 <div className="w-24 shrink-0 text-sm text-gray-600">{stage.label}</div>
                 <div className="flex-1 bg-gray-50 rounded-full h-7 relative overflow-hidden">

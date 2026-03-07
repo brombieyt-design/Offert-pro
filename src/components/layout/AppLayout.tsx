@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { loadSettings } from "@/lib/settings";
+import { OnboardingModal } from "@/components/OnboardingModal";
 
 interface NavItem {
   label: string;
@@ -86,16 +87,29 @@ export function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [companyName, setCompanyName] = useState("Mitt Företag");
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     const s = loadSettings();
-    if (s.companyName) setCompanyName(s.companyName);
+    if (s.companyName) {
+      setCompanyName(s.companyName);
+    } else {
+      setShowOnboarding(true);
+    }
   }, []);
 
   const initial = companyName.charAt(0).toUpperCase();
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
+      {showOnboarding && (
+        <OnboardingModal
+          onComplete={(name) => {
+            setCompanyName(name);
+            setShowOnboarding(false);
+          }}
+        />
+      )}
       {/* Mobilöverlägg */}
       {mobileMenuOpen && (
         <div
