@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - main
 
 jobs:
   deploy:
@@ -23,7 +24,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Vercel
+      - name: Deploy to Vercel (Production)
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
